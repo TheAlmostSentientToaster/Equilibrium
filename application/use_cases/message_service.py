@@ -1,7 +1,8 @@
-from application.ports import MessagePort
+from application.ports import MessagePort, RepositoryPort
+
 
 class MessageService(MessagePort):
-    def __init__(self):
+    def __init__(self, repository_port=RepositoryPort):
         self._messages: list[str] = []
 
     def handle_message(self, text: str) -> list[str]:
