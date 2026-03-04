@@ -1,6 +1,6 @@
-from ports import BotMessagePort
+from application.ports import MessagePort
 
-class MessageService(BotMessagePort):
+class MessageService(MessagePort):
     def __init__(self):
         self._messages: list[str] = []
 

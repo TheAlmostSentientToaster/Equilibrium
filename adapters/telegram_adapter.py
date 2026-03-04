@@ -1,14 +1,14 @@
 from telegram import Update # pip install python-telegram-bot==20.7
-from telegram.ext import ApplicationBuilder, MessageHandler, ContextTypes, filters, CallbackContext
-from ports import BotMessagePort
+from telegram.ext import ApplicationBuilder, MessageHandler, ContextTypes, filters
+from application.ports import MessagePort
 
-class TelegamBotAdapter:
-    def __init__(self, bot_message_port: BotMessagePort):
-        self.bot_message_port = bot_message_port
+class TelegramAdapter:
+    def __init__(self, message_port: MessagePort):
+        self.message_port = message_port
 
     async def on_update(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         text = update.message.text
-        messages = self.bot_message_port.handle_message(text)
+        messages = self.message_port.handle_message(text)
 
         response = "\n".join(messages)
         await update.message.reply_text(response)
