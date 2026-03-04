@@ -7,8 +7,9 @@ class TelegramAdapter:
         self.message_port = message_port
 
     async def on_update(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        text = update.message.text
-        messages = self.message_port.handle_message(text)
+        content = update.message.text
+        user = update.message.from_user.first_name
+        messages = self.message_port.handle_message(content, user)
 
         response = "\n".join(messages)
         await update.message.reply_text(response)

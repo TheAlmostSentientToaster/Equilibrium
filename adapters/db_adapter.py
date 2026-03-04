@@ -2,6 +2,7 @@ import sqlite3
 import os
 from application.ports import RepositoryPort
 from dotenv import load_dotenv
+from Domain.Message import Message
 
 class DbAdapter(RepositoryPort):
     def get_all_messages(self) -> list[str]:
@@ -19,14 +20,14 @@ class DbAdapter(RepositoryPort):
         finally:
             connection.close()
 
-    def save_message(self, message: str) -> bool:
+    def save_message(self, message: Message) -> bool:
         load_dotenv()
         db_path = os.getenv('Messages_DB_PATH')
         connection = sqlite3.connect(db_path)
 
         try:
             cursor = connection.cursor()
-            cursor.execute("INSERT INTO Messages (Content) VALUES (?)", (message,))
+            cursor.execute("INSERT INTO Messages (Content, User) VALUES (?,?)", (message.content, message.user))
             connection.commit()
             return True
         except Exception:
