@@ -11,5 +11,5 @@ class RepositoryPort(ABC):
         pass
 
     @abstractmethod
-    def get_messages_all(self) -> list[str]:
+    def get_all_messages(self) -> list[str]:
         pass
