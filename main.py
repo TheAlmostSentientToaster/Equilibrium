@@ -11,5 +11,5 @@ if not TOKEN:
 
 db_adapter = DbAdapter()
 message_service = MessageService(repository_port=db_adapter)
-bot = TelegramAdapter(message_service)
+bot = TelegramAdapter(message_service, message_service)
 bot.run(TOKEN)

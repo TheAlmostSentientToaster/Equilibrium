@@ -1,9 +1,16 @@
 from abc import ABC, abstractmethod
 from Domain.Message import Message
 
-class MessagePort(ABC):
+#Driven Ports
+class InputMessagePort(ABC):
     @abstractmethod
-    def handle_message(self, content: str, user: str) -> list[str]:
+    def receive_message(self, content: str, user: str):
+        pass
+
+#Driving Ports
+class OutputMessagePort(ABC):
+    @abstractmethod
+    def send_messages(self):
         pass
 
 class RepositoryPort(ABC):
@@ -12,5 +19,5 @@ class RepositoryPort(ABC):
         pass
 
     @abstractmethod
-    def get_all_messages(self) -> list[str]:
+    def get_all_messages(self) -> list[Message]:
         pass
