@@ -14,7 +14,7 @@ class TelegramAdapter:
         self.input_message_port.receive_message(content, user)
 
         messages = self.output_message_port.send_messages()
-        response = "\n".join(messages)
+        response = "\n".join([message.content for message in messages])
         await update.message.reply_text(response)
 
     def run(self, token: str):

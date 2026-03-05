@@ -1,20 +1,28 @@
 import sqlite3
 import os
+from sys import exception
+
 from application.ports import RepositoryPort
 from dotenv import load_dotenv
 from Domain.Message import Message
 
 class DbAdapter(RepositoryPort):
-    def get_all_messages(self) -> list[str]:
+    def get_all_messages(self) -> list[Message]:
         load_dotenv()
         db_path = os.getenv('Messages_DB_PATH')
         connection = sqlite3.connect(db_path)
 
         try:
             cursor = connection.cursor()
-            cursor.execute("SELECT Content FROM Messages")
+            cursor.execute("SELECT ID, Content, User FROM Messages")
             rows = cursor.fetchall()
-            return [row[0] for row in rows]
+            messages = []
+
+            for row in rows:
+                message = Message(id= row[0], content= row[1], user=row[2])
+                messages.append(message)
+
+            return messages
         except Exception:
             return []
         finally:
