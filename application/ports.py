@@ -1,10 +1,11 @@
 from abc import ABC, abstractmethod
 from Domain.Message import Message
+from telegram import Update
 
 #Driven Ports
 class InputMessagePort(ABC):
     @abstractmethod
-    def receive_message(self, content: str, user: str):
+    def receive_message(self, content:str, user:str):
         pass
 
 #Driving Ports
