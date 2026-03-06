@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from telegram import Bot
 from telegram.ext import ApplicationBuilder, MessageHandler, filters
 
-from application.use_cases.message_services import ReceiveMessageService, SendMessageService
+from application.use_cases.message_services import MessageService
 from adapters.telegram_adapters import TelegramOutboundAdapter, TelegramInboundAdapter
 from adapters.db_adapter import DbAdapter
 
@@ -18,9 +18,8 @@ bot = Bot(token=TOKEN)
 
 telegram_outbound_adapter = TelegramOutboundAdapter(bot)
 
-send_message_service = SendMessageService(repository_port=db_adapter, output_message_port=telegram_outbound_adapter)
-receive_message_service = ReceiveMessageService(repository_port=db_adapter, send_message_service=send_message_service)
+message_service = MessageService(repository_port=db_adapter, output_message_port=telegram_outbound_adapter)
 
-telegram_inbound_adapter = TelegramInboundAdapter(receive_message_service.receive_message, app)
+telegram_inbound_adapter = TelegramInboundAdapter(message_service.receive_message, app)
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, telegram_inbound_adapter.on_update))
 app.run_polling()
