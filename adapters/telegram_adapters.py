@@ -5,8 +5,8 @@ from Domain.Message import Message
 from Domain.ChatContext import ChatContext
 
 class TelegramInboundAdapter(InputMessagePort):
-    def __init__(self, receive_message_service, application):
-        self.receive_message_service = receive_message_service
+    def __init__(self, message_service, application):
+        self.message_service = message_service
         self.application = application
 
     async def on_update(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -16,7 +16,7 @@ class TelegramInboundAdapter(InputMessagePort):
         await self.receive_message(content, user, chat_context)
 
     async def receive_message(self, content:str, user:str, chat_context:ChatContext):
-        await self.receive_message_service(content=content, user=user, chat_context=chat_context)
+        await self.message_service(content=content, user=user, chat_context=chat_context)
 
 class TelegramOutboundAdapter(OutputMessagePort):
     def __init__(self, bot):
