@@ -1,5 +1,3 @@
-import os
-from dotenv import load_dotenv
 from telegram import Bot
 from telegram.ext import ApplicationBuilder, MessageHandler, filters
 
