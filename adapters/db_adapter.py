@@ -1,44 +1,30 @@
 import sqlite3
-import os
-from sys import exception
 
 from application.ports import RepositoryPort
-from dotenv import load_dotenv
 from Domain.Message import Message
+from config import Config
 
 class DbAdapter(RepositoryPort):
-    def get_all_messages(self) -> list[Message]:
-        load_dotenv()
-        db_path = os.getenv('Messages_DB_PATH')
-        connection = sqlite3.connect(db_path)
-
+    def _execute_query(self, query: str, params: tuple = None, fetch: bool = True):
         try:
-            cursor = connection.cursor()
-            cursor.execute("SELECT ID, Content, User FROM Messages")
-            rows = cursor.fetchall()
-            messages = []
+            with sqlite3.connect(Config.MESSAGES_DB_PATH) as connection:
+                cursor = connection.cursor()
+                cursor.execute(query, params or ())
+                if fetch:
+                    return cursor.fetchall()
+                connection.commit()
+                return True
+        except sqlite3.Error as e:
+            print(f"Database error: {e}")
+            return [] if fetch else False
 
-            for row in rows:
-                message = Message(id= row[0], content= row[1], user=row[2])
-                messages.append(message)
-
-            return messages
-        except Exception:
-            return []
-        finally:
-            connection.close()
+    def get_all_messages(self) -> list[Message]:
+        rows = self._execute_query("SELECT ID, Content, User FROM Messages")
+        return [Message(id=row[0], content=row[1], user=row[2]) for row in rows]
 
     def save_message(self, message: Message) -> bool:
-        load_dotenv()
-        db_path = os.getenv('Messages_DB_PATH')
-        connection = sqlite3.connect(db_path)
-
-        try:
-            cursor = connection.cursor()
-            cursor.execute("INSERT INTO Messages (Content, User) VALUES (?,?)", (message.content, message.user))
-            connection.commit()
-            return True
-        except Exception:
-            return False
-        finally:
-            connection.close()
+        return self._execute_query(
+            "INSERT INTO Messages (Content, User) VALUES (?,?)",
+            (message.content, message.user),
+            fetch=False
+        )
