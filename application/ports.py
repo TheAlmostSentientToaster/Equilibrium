@@ -1,11 +1,17 @@
 from abc import ABC, abstractmethod
-from Domain.ChatContext import ChatContext
-from Domain.Message import Message
+from domain.chat_context import ChatContext
+from domain.message import Message
+from domain.photo import Photo
+
 
 #Driven Ports
 class InputMessagePort(ABC):
     @abstractmethod
     def receive_message(self, content:str, user:str, chat_context:ChatContext):
+        pass
+
+    @abstractmethod
+    def receive_photo(self, photo_data: bytearray, user: str, chat_context: ChatContext):
         pass
 
 #Driving Ports
@@ -21,4 +27,8 @@ class RepositoryPort(ABC):
 
     @abstractmethod
     def get_all_messages(self) -> list[Message]:
+        pass
+
+    @abstractmethod
+    def save_photo(self, photo: Photo):
         pass
