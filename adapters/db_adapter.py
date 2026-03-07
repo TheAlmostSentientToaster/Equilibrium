@@ -1,7 +1,8 @@
 import sqlite3
 
+from domain.photo import Photo
 from application.ports import RepositoryPort
-from Domain.Message import Message
+from domain.message import Message
 from config import Config
 
 class DbAdapter(RepositoryPort):
@@ -28,3 +29,7 @@ class DbAdapter(RepositoryPort):
             (message.content, message.user),
             fetch=False
         )
+
+    def save_photo(self, photo: Photo):
+        #to be implemented
+        pass
