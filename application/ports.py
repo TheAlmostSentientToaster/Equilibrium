@@ -1,4 +1,6 @@
 from abc import ABC, abstractmethod
+from typing import Optional
+
 from domain.chat_context import ChatContext
 from domain.message import Message
 from domain.photo import Photo
@@ -30,5 +32,9 @@ class RepositoryPort(ABC):
         pass
 
     @abstractmethod
-    def save_photo(self, photo: Photo, price: float):
+    def save_photo(self, photo: Photo) -> bool:
+        pass
+
+    @abstractmethod#
+    def save_photo_on_disk(self, photo: bytearray) -> Optional[str]:
         pass

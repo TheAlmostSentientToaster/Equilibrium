@@ -12,9 +12,11 @@ class PhotoService:
         self.price_extraction_service = price_extraction_service
 
     async def receive_photo(self, photo: bytearray, user_id: int, chat_context: ChatContext):
-        bill = Photo(id=None, photo=photo, user_id=user_id)
+        bill = Photo(id=None, photo=photo, user_id=user_id, sum=None)
         price = self.price_extraction_service.coordinate_price_search(bill.photo)
-        self.repository_port.save_photo(bill, price)
+        bill.sum = price
+
+        self.repository_port.save_photo(bill)
 
         if price:
             message = "You just paid " + str(price)

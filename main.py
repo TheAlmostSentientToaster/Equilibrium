@@ -4,7 +4,7 @@ from telegram import Bot
 from telegram.ext import ApplicationBuilder, MessageHandler, filters
 from application.use_cases.message_service import MessageService
 from adapters.telegram_adapters import TelegramOutboundAdapter, TelegramInboundAdapter
-from adapters.db_adapter import DbAdapter
+from adapters.repository_adapter import DbAdapter
 from application.use_cases.photo_service import PhotoService
 from config import Config
 from domain.domain_services.image_processing_service import ImageProcessingService
@@ -20,7 +20,7 @@ app = ApplicationBuilder().token(TOKEN).build()
 bot = Bot(token=TOKEN)
 reader = easyocr.Reader([config.OCR_LANGUAGE])
 
-db_adapter = DbAdapter()
+db_adapter = DbAdapter(config.IMAGE_PATH)
 telegram_outbound_adapter = TelegramOutboundAdapter(bot)
 message_service = MessageService(repository_port=db_adapter, output_message_port=telegram_outbound_adapter)
 ocr_reading_service = OcrReadingService(reader)

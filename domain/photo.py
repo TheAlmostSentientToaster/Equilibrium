@@ -7,3 +7,4 @@ class Photo:
     id: Optional[int]
     photo: bytearray
     user_id: Optional[int]
+    sum: Optional[float]

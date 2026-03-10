@@ -1,4 +1,9 @@
 import sqlite3
+import io
+from typing import Optional
+
+from PIL import Image
+from datetime import datetime
 
 from domain.photo import Photo
 from application.ports import RepositoryPort
@@ -6,6 +11,9 @@ from domain.message import Message
 from config import Config
 
 class DbAdapter(RepositoryPort):
+    def __init__(self, images_path: str):
+        self.images_storage_path = images_path
+
     def _execute_query(self, query: str, params: tuple = None, fetch: bool = True):
         try:
             with sqlite3.connect(Config.MESSAGES_DB_PATH) as connection:
@@ -30,6 +38,28 @@ class DbAdapter(RepositoryPort):
             fetch=False
         )
 
-    def save_photo(self, photo: Photo, price: float):
+    def save_photo(self, photo: Photo) -> bool:
+        path = self.save_photo_on_disk(photo)
+        if path is not None:
+            self._execute_query(
+            "INSERT INTO Images (User_id, Image_path, Sum) VALUES (?,?,?)",
+            (path, photo.sum, photo.user_id),
+            fetch=False
+            )
+            return True
+        else:
+            return False
 
-        pass
+    def save_photo_on_disk(self, photo: Photo) -> Optional[str]:
+        try:
+            image_stream = io.BytesIO(photo.photo)
+            image = Image.open(image_stream)
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            image_path = f"{self.images_storage_path}user_{photo.user_id}_{timestamp}.png"
+
+            image.save(image_path)
+            print(f"Image saved successfully: {image_path}")
+            return image_path
+        except Exception as e:
+            print(f"Error while saving image: {e}")
+            return None
