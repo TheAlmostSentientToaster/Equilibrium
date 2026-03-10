@@ -1,5 +1,6 @@
 import sqlite3
 import io
+from logging import exception
 from typing import Optional
 
 from PIL import Image
@@ -29,21 +30,47 @@ class DbAdapter(RepositoryPort):
 
     def get_all_messages(self) -> list[Message]:
         rows = self._execute_query("SELECT ID, Content, User_id FROM Messages")
-        return [Message(message_id=row[0], content=row[1], user_id=row[2]) for row in rows]
+        return [Message(message_id=row[0], content=row[1], user_id=row[2], user_name=None) for row in rows]
 
     def save_message(self, message: Message) -> bool:
-        return self._execute_query(
-            "INSERT INTO Messages (Content, User_id) VALUES (?,?)",
-            (message.content, message.user_id),
-            fetch=False
-        )
+        self.save_user(message.user_id, message.user_name)
+
+        try:
+            self._execute_query(
+                "INSERT INTO Messages (Content, User_id) VALUES (?,?)",
+                (message.content, message.user_id),
+                fetch=False
+            )
+            return True
+        except sqlite3.Error as e:
+            print(f"Database error: {e}")
+            return False
+
+    def save_user(self, user_id: int, user_name: str) -> bool:
+        count = self._execute_query("SELECT COUNT(*) FROM Users WHERE User_id = ?",
+                                    (user_id,),
+                                    fetch=True)
+
+        try:
+            if not count or count[0][0] == 0:
+                self._execute_query(
+                    "INSERT INTO Users (User_id, User_name) VALUES (?,?)",
+                    (user_id, user_name),
+                    fetch=False
+                )
+            return True
+        except sqlite3.Error as e:
+            print(f"Database error: {e}")
+            return False
 
     def save_photo(self, photo: Photo) -> bool:
+        self.save_user(photo.user_id, photo.user_name)
+
         path = self.save_photo_on_disk(photo)
         if path is not None:
             self._execute_query(
             "INSERT INTO Images (User_id, Image_path, Sum) VALUES (?,?,?)",
-            (path, photo.sum, photo.user_id),
+            (photo.user_id, path, photo.sum,),
             fetch=False
             )
             return True

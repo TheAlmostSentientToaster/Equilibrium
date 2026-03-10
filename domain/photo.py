@@ -8,3 +8,4 @@ class Photo:
     photo: bytearray
     user_id: Optional[int]
     sum: Optional[float]
+    user_name: Optional[str]
