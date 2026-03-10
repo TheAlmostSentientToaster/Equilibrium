@@ -4,6 +4,6 @@ from typing import Optional
 
 @dataclass
 class Message:
-    id: Optional[int]
+    message_id: Optional[int]
     content: str
-    user: Optional[str]
+    user_id: Optional[int]

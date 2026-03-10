@@ -7,11 +7,11 @@ from domain.photo import Photo
 #Driven Ports
 class InputMessagePort(ABC):
     @abstractmethod
-    def receive_message(self, content:str, user:str, chat_context:ChatContext):
+    def receive_message(self, content:str, user_id: int, chat_context:ChatContext):
         pass
 
     @abstractmethod
-    def receive_photo(self, photo_data: bytearray, user: str, chat_context: ChatContext):
+    def receive_photo(self, photo_data: bytearray, user_id: int, chat_context: ChatContext):
         pass
 
 #Driving Ports
@@ -30,5 +30,5 @@ class RepositoryPort(ABC):
         pass
 
     @abstractmethod
-    def save_photo(self, photo: Photo):
+    def save_photo(self, photo: Photo, price: float):
         pass

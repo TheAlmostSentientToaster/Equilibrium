@@ -28,7 +28,7 @@ image_processing_service = ImageProcessingService()
 text_analyzing_service = TextAnalyzingService(config)
 price_extraction_service = PriceExtractionService(ocr_reading_service, image_processing_service, text_analyzing_service, config=config)
 photo_service = PhotoService(repository_port=db_adapter, output_message_port=telegram_outbound_adapter, price_extraction_service=price_extraction_service)
-telegram_inbound_adapter = TelegramInboundAdapter(message_service.receive_message, photo_service.receive_photo, application= app)
+telegram_inbound_adapter = TelegramInboundAdapter(message_service, photo_service, application= app)
 
 app.add_handler(MessageHandler(
     (filters.TEXT | filters.PHOTO) & ~filters.COMMAND,

@@ -6,4 +6,4 @@ from typing import Optional
 class Photo:
     id: Optional[int]
     photo: bytearray
-    user: Optional[str]
+    user_id: Optional[int]

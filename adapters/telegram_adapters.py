@@ -1,13 +1,15 @@
 from telegram import Update # pip install python-telegram-bot==20.7
-from telegram.ext import ApplicationBuilder, MessageHandler, ContextTypes, filters
+from telegram.ext import Application, ContextTypes
 from application.ports import InputMessagePort, OutputMessagePort
+from application.use_cases.photo_service import PhotoService
+from application.use_cases.message_service import MessageService
 from domain.message import Message
 from domain.chat_context import ChatContext
 
 class TelegramInboundAdapter(InputMessagePort):
-    def __init__(self, message_service, photo_service, application):
-        self.message_service = message_service
-        self.photo_service = photo_service
+    def __init__(self, message_service: MessageService, photo_service: PhotoService, application: Application):
+        self.message_service = message_service.receive_message
+        self.photo_service = photo_service.receive_photo
         self.application = application
 
     async def on_update(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -15,20 +17,20 @@ class TelegramInboundAdapter(InputMessagePort):
             photo = update.message.photo[-1]
             file = await context.bot.get_file(photo.file_id)
             photo_bytes = await file.download_as_bytearray()
-            user = update.message.from_user.first_name
+            user_id = update.message.from_user.id
             chat_context = ChatContext(chat_id=update.message.chat_id)
-            await self.receive_photo(photo_bytes, user, chat_context)
+            await self.receive_photo(photo_bytes, user_id, chat_context)
         else:
             content = update.message.text
-            user = update.message.from_user.first_name
+            user_id = update.message.from_user.id
             chat_context = ChatContext(chat_id=update.message.chat_id)
-            await self.receive_message(content, user, chat_context)
+            await self.receive_message(content, user_id, chat_context)
 
-    async def receive_photo(self, photo_data: bytearray, user: str, chat_context: ChatContext):
-        await self.photo_service(photo_data, user, chat_context)
+    async def receive_photo(self, photo_data: bytearray, user_id: int, chat_context: ChatContext):
+        await self.photo_service(photo_data, user_id, chat_context)
 
-    async def receive_message(self, content:str, user:str, chat_context:ChatContext):
-        await self.message_service(content=content, user=user, chat_context=chat_context)
+    async def receive_message(self, content:str, user_id:int, chat_context:ChatContext):
+        await self.message_service(content=content, user_id=user_id, chat_context=chat_context)
 
 class TelegramOutboundAdapter(OutputMessagePort):
     def __init__(self, bot):

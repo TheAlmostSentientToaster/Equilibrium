@@ -20,16 +20,16 @@ class DbAdapter(RepositoryPort):
             return [] if fetch else False
 
     def get_all_messages(self) -> list[Message]:
-        rows = self._execute_query("SELECT ID, Content, User FROM Messages")
-        return [Message(id=row[0], content=row[1], user=row[2]) for row in rows]
+        rows = self._execute_query("SELECT ID, Content, User_id FROM Messages")
+        return [Message(message_id=row[0], content=row[1], user_id=row[2]) for row in rows]
 
     def save_message(self, message: Message) -> bool:
         return self._execute_query(
-            "INSERT INTO Messages (Content, User) VALUES (?,?)",
-            (message.content, message.user),
+            "INSERT INTO Messages (Content, User_id) VALUES (?,?)",
+            (message.content, message.user_id),
             fetch=False
         )
 
-    def save_photo(self, photo: Photo):
-        #to be implemented
+    def save_photo(self, photo: Photo, price: float):
+
         pass
