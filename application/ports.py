@@ -4,6 +4,7 @@ from typing import Optional
 from domain.chat_context import ChatContext
 from domain.message import Message
 from domain.photo import Photo
+from domain.command import Command
 
 
 #Driven Ports
@@ -14,6 +15,10 @@ class InputMessagePort(ABC):
 
     @abstractmethod
     def receive_photo(self, photo_data: bytearray, user_id: int, user_name: str, chat_context: ChatContext):
+        pass
+
+    @abstractmethod
+    def receive_command(self, command: Command, chat_context: ChatContext):
         pass
 
 #Driving Ports
@@ -35,6 +40,10 @@ class RepositoryPort(ABC):
     def save_photo(self, photo: Photo) -> bool:
         pass
 
-    @abstractmethod#
+    @abstractmethod
     def save_photo_on_disk(self, photo: bytearray) -> Optional[str]:
+        pass
+
+    @abstractmethod
+    def get_sums_of_deposits(self) -> list:
         pass
