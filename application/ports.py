@@ -69,7 +69,7 @@ class RepositoryPort(ABC):
         pass
 
     @abstractmethod
-    def save_photo(self, photo: Photo) -> bool:
+    def save_photo(self, photo: Photo) -> Optional[int]:
         pass
 
     @abstractmethod

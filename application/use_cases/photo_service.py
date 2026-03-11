@@ -16,10 +16,10 @@ class PhotoService(PhotoServicePort):
         price = self.price_extraction_service.coordinate_price_search(bill.photo)
         bill.sum = price
 
-        self.repository_port.save_photo(bill)
+        payment_id = self.repository_port.save_photo(bill)
 
         if price:
-            message = "You just paid " + str(price)
+            message = f"You just paid {str(price)}\nIs that wrong? Press /X{payment_id}"
         else:
             message = 'Seems we could not find the total sum on the bill'
         await self.send_message(message, chat_context)

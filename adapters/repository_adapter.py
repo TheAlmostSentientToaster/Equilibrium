@@ -15,15 +15,19 @@ class DbAdapter(RepositoryPort):
     def __init__(self, images_path: str):
         self.images_storage_path = images_path
 
-    def _execute_query(self, query: str, params: tuple = None, fetch: bool = True):
+    def _execute_query(self, query: str, params: tuple = None, fetch: bool = True, return_lastrowid: bool = False):
         try:
             with sqlite3.connect(Config.MESSAGES_DB_PATH) as connection:
                 cursor = connection.cursor()
                 cursor.execute(query, params or ())
                 if fetch:
                     return cursor.fetchall()
-                connection.commit()
-                return True
+                elif return_lastrowid:
+                    connection.commit()
+                    return cursor.lastrowid
+                else:
+                    connection.commit()
+                    return True
         except sqlite3.Error as e:
             print(f"Database error: {e}")
             return [] if fetch else False
@@ -63,19 +67,20 @@ class DbAdapter(RepositoryPort):
             print(f"Database error: {e}")
             return False
 
-    def save_photo(self, photo: Photo) -> bool:
+    def save_photo(self, photo: Photo) -> Optional[int]:
         self.save_user(photo.user_id, photo.user_name)
 
         path = self.save_photo_on_disk(photo)
         if path is not None:
-            self._execute_query(
+            payment_id = self._execute_query(
             "INSERT INTO Payments (User_id, Image_path, Sum) VALUES (?,?,?)",
             (photo.user_id, path, photo.sum,),
-            fetch=False
+            fetch=False,
+            return_lastrowid=True
             )
-            return True
+            return payment_id
         else:
-            return False
+            return None
 
     def save_photo_on_disk(self, photo: Photo) -> Optional[str]:
         try:
