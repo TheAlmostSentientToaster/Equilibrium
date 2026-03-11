@@ -44,6 +44,15 @@ class PhotoServicePort(ABC):
     async def send_message(self, message: str, chat_context: ChatContext):
         pass
 
+class UserVerificationPort(ABC):
+    @abstractmethod
+    async def verify_user(self, user_id: int, chat_context: ChatContext):
+        pass
+
+    @abstractmethod
+    async def send_message(self, message: str, chat_context: ChatContext):
+        pass
+
 #Driving Ports
 class OutputMessagePort(ABC):
     @abstractmethod
