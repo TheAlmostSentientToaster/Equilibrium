@@ -1,16 +1,12 @@
-from numpy.f2py.auxfuncs import throw_error
 from telegram import Update # pip install python-telegram-bot==20.7
 from telegram.ext import Application, ContextTypes
-from application.ports import InputMessagePort, OutputMessagePort
-from application.use_cases.command_service import CommandService
-from application.use_cases.photo_service import PhotoService
-from application.use_cases.message_service import MessageService
+from application.ports import InputMessagePort, OutputMessagePort, MessageServicePort, PhotoServicePort, CommandServicePort
 from domain.command import Command
 from domain.message import Message
 from domain.chat_context import ChatContext
 
 class TelegramInboundAdapter(InputMessagePort):
-    def __init__(self, message_service: MessageService, photo_service: PhotoService, command_service: CommandService, application: Application):
+    def __init__(self, message_service: MessageServicePort, photo_service: PhotoServicePort, command_service: CommandServicePort, application: Application):
         self.message_service = message_service.receive_message
         self.photo_service = photo_service.receive_photo
         self.application = application
