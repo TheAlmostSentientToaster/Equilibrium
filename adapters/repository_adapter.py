@@ -1,6 +1,5 @@
 import sqlite3
 import io
-from logging import exception
 from typing import Optional
 
 from PIL import Image
@@ -15,15 +14,19 @@ class DbAdapter(RepositoryPort):
     def __init__(self, images_path: str):
         self.images_storage_path = images_path
 
-    def _execute_query(self, query: str, params: tuple = None, fetch: bool = True):
+    def _execute_query(self, query: str, params: tuple = None, fetch: bool = True, return_last_row_id: bool = False):
         try:
             with sqlite3.connect(Config.MESSAGES_DB_PATH) as connection:
                 cursor = connection.cursor()
                 cursor.execute(query, params or ())
                 if fetch:
                     return cursor.fetchall()
-                connection.commit()
-                return True
+                elif return_last_row_id:
+                    connection.commit()
+                    return cursor.lastrowid
+                else:
+                    connection.commit()
+                    return True
         except sqlite3.Error as e:
             print(f"Database error: {e}")
             return [] if fetch else False
@@ -35,15 +38,13 @@ class DbAdapter(RepositoryPort):
     def save_message(self, message: Message) -> bool:
         self.save_user(message.user_id, message.user_name)
 
-        try:
-            self._execute_query(
+        if self._execute_query(
                 "INSERT INTO Messages (Content, User_id) VALUES (?,?)",
                 (message.content, message.user_id),
                 fetch=False
-            )
+            ):
             return True
-        except sqlite3.Error as e:
-            print(f"Database error: {e}")
+        else:
             return False
 
     def save_user(self, user_id: int, user_name: str) -> bool:
@@ -51,31 +52,31 @@ class DbAdapter(RepositoryPort):
                                     (user_id,),
                                     fetch=True)
 
-        try:
-            if not count or count[0][0] == 0:
-                self._execute_query(
-                    "INSERT INTO Users (User_id, User_name) VALUES (?,?)",
-                    (user_id, user_name),
-                    fetch=False
-                )
-            return True
-        except sqlite3.Error as e:
-            print(f"Database error: {e}")
-            return False
+        if not count or count[0][0] == 0:
+            if self._execute_query(
+                "INSERT INTO Users (User_id, User_name) VALUES (?,?)",
+                (user_id, user_name),
+                fetch=False
+            ):
+                return True
+            else:
+                return False
+        return True
 
-    def save_photo(self, photo: Photo) -> bool:
+    def save_photo(self, photo: Photo) -> Optional[int]:
         self.save_user(photo.user_id, photo.user_name)
 
         path = self.save_photo_on_disk(photo)
         if path is not None:
-            self._execute_query(
+            payment_id = self._execute_query(
             "INSERT INTO Payments (User_id, Image_path, Sum) VALUES (?,?,?)",
             (photo.user_id, path, photo.sum,),
-            fetch=False
+            fetch=False,
+            return_last_row_id=True
             )
-            return True
+            return payment_id
         else:
-            return False
+            return None
 
     def save_photo_on_disk(self, photo: Photo) -> Optional[str]:
         try:
@@ -105,3 +106,35 @@ class DbAdapter(RepositoryPort):
         for result in results:
             deposits.append((result[1], result[2]))
         return deposits
+
+    def delete_payment(self, payment_id: int) -> bool:
+        payment = self._execute_query("""
+            SELECT Sum
+            From Payments
+            Where Payment_id = (?)
+            """,
+            (payment_id,)
+                                      )
+
+        if not payment:
+            print("No payment returned.")
+            return False
+        elif payment == "":
+            print("Payment already empty.")
+            return False
+        else:
+            if self._execute_query("""
+                        UPDATE Payments
+                        SET Error = Sum, Sum = NULL
+                        Where Payment_id = (?)
+                        """,
+                        (payment_id,),
+                        fetch=False, return_last_row_id=False
+                                ):
+                return True
+            else:
+                return False
+
+
+
+

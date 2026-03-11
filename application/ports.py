@@ -69,7 +69,7 @@ class RepositoryPort(ABC):
         pass
 
     @abstractmethod
-    def save_photo(self, photo: Photo) -> bool:
+    def save_photo(self, photo: Photo) -> Optional[int]:
         pass
 
     @abstractmethod
@@ -78,4 +78,8 @@ class RepositoryPort(ABC):
 
     @abstractmethod
     def get_sums_of_deposits(self) -> list:
+        pass
+
+    @abstractmethod
+    def delete_payment(self, payment_id: int) -> bool:
         pass
