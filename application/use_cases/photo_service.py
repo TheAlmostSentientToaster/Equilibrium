@@ -1,12 +1,12 @@
 from domain.chat_context import ChatContext
-from application.ports import OutputMessagePort, RepositoryPort
+from application.ports import OutputMessagePort, RepositoryPort, PhotoServicePort
+from domain.interfaces.price_extraction_interface import PriceExtractionInterface
 from domain.photo import Photo
 from domain.message import Message
-from domain.domain_services.price_extraction_service import PriceExtractionService
 
 
-class PhotoService:
-    def __init__(self, repository_port: RepositoryPort, output_message_port: OutputMessagePort, price_extraction_service: PriceExtractionService):
+class PhotoService(PhotoServicePort):
+    def __init__(self, repository_port: RepositoryPort, output_message_port: OutputMessagePort, price_extraction_service: PriceExtractionInterface):
         self.repository_port = repository_port
         self.output_message_port = output_message_port
         self.price_extraction_service = price_extraction_service

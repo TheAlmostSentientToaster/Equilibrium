@@ -21,6 +21,29 @@ class InputMessagePort(ABC):
     def receive_command(self, command: Command, chat_context: ChatContext):
         pass
 
+class CommandServicePort(ABC):
+    @abstractmethod
+    async def handle_command(self, command: Command, chat_context: ChatContext):
+        pass
+
+class MessageServicePort(ABC):
+    @abstractmethod
+    async def receive_message(self, content: str, user_id: int, user_name: str, chat_context: ChatContext):
+        pass
+
+    @abstractmethod
+    async def send_all_messages(self, chat_context: ChatContext):
+        pass
+
+class PhotoServicePort(ABC):
+    @abstractmethod
+    async def receive_photo(self, photo: bytearray, user_id: int, user_name: str, chat_context: ChatContext):
+        pass
+
+    @abstractmethod
+    async def send_message(self, message: str, chat_context: ChatContext):
+        pass
+
 #Driving Ports
 class OutputMessagePort(ABC):
     @abstractmethod

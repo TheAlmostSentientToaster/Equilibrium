@@ -10,6 +10,7 @@ class Config:
     OCR_LANGUAGE = os.getenv('OCR_LANGUAGE')
     KEYWORDS_FOR_PRICE_SEARCH = os.getenv('KEYWORDS_FOR_PRICE_SEARCH')
     IMAGE_PATH = os.getenv('IMAGES_PATH')
+    USER_WHITELIST = os.getenv('USER_WHITELIST')
 
     @classmethod
     def validate(cls):
@@ -23,3 +24,5 @@ class Config:
             raise ValueError("KEYWORDS_FOR_PRICE_SEARCH environment variable is required")
         if not cls.IMAGE_PATH:
             raise ValueError("IMAGE_PATH environment variable is required")
+        if not cls.USER_WHITELIST:
+            raise ValueError("USER_WHITELIST environment variable is required")

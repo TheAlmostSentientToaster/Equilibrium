@@ -1,8 +1,8 @@
 from domain.chat_context import ChatContext
-from application.ports import OutputMessagePort, RepositoryPort
+from application.ports import OutputMessagePort, RepositoryPort, MessageServicePort
 from domain.message import Message
 
-class MessageService:
+class MessageService(MessageServicePort):
     def __init__(self, repository_port: RepositoryPort, output_message_port: OutputMessagePort):
         self.repository_port = repository_port
         self.output_message_port = output_message_port

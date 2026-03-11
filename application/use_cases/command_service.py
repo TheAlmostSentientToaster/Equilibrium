@@ -1,11 +1,11 @@
 from domain.chat_context import ChatContext
 from domain.command import Command
-from application.ports import OutputMessagePort
+from application.ports import OutputMessagePort, CommandServicePort
 from domain.interfaces.balance_calculation_interface import BalanceCalculationInterface
 from domain.message import Message
 
 
-class CommandService:
+class CommandService(CommandServicePort):
     def __init__(self, output_message_port: OutputMessagePort, balance_calculation_interface: BalanceCalculationInterface,  message: type[Message]):
         self.output_message_port = output_message_port
         self.balance_calculation_interface = balance_calculation_interface
