@@ -69,7 +69,7 @@ class DbAdapter(RepositoryPort):
         path = self.save_photo_on_disk(photo)
         if path is not None:
             self._execute_query(
-            "INSERT INTO Images (User_id, Image_path, Sum) VALUES (?,?,?)",
+            "INSERT INTO Payments (User_id, Image_path, Sum) VALUES (?,?,?)",
             (photo.user_id, path, photo.sum,),
             fetch=False
             )
@@ -92,8 +92,14 @@ class DbAdapter(RepositoryPort):
             return None
 
     def get_sums_of_deposits(self) -> list:
-        query = "SELECT u.User_id, u.User_name, COALESCE(SUM(i.Sum), 0) AS TotalSum FROM Users u LEFT JOIN Images i ON u.User_id = i.User_id GROUP BY u.User_id, u.User_name ORDER BY u.User_id;"
-        results = self._execute_query(query=query,params=None,fetch=True)
+        query = """
+            SELECT u.User_id, u.User_name, COALESCE(SUM(i.Sum), 0) AS TotalSum 
+            FROM Users u 
+            LEFT JOIN Payments i ON u.User_id = i.User_id 
+            GROUP BY u.User_id, u.User_name 
+            ORDER BY u.User_id
+        """
+        results = self._execute_query(query, params=(), fetch=True)
         deposits = list()
 
         for result in results:
