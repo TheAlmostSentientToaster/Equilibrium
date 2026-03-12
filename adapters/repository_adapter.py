@@ -117,7 +117,7 @@ class DbAdapter(RepositoryPort):
             """,
             (payment_id,)
                                       )
-        error_message = f"Payment deleted by User: {payment}€"
+        error_message = f"Payment deleted by User: {payment[0][0]}€"
 
         if not payment:
             print("No payment returned.")
@@ -128,10 +128,10 @@ class DbAdapter(RepositoryPort):
         else:
             if self._execute_query("""
                         UPDATE Payments
-                        SET Error = (?), Sum = NULL
+                        SET Error = ?, Sum = NULL
                         Where Payment_id = (?)
                         """,
-                        (payment_id, error_message),
+                        (error_message, payment_id),
                         fetch=False, return_last_row_id=False
                                 ):
                 return True
