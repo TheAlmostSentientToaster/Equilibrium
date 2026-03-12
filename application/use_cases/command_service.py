@@ -27,12 +27,12 @@ class CommandService(CommandServicePort):
                 )
                 responses.append(message)
         elif command.content == "start":
-            response = [self.message(
+            response = self.message(
                 message_id=None,
                 content="Welcome to Equilibrium.",
                 user_id=None,
                 user_name=None
-            )]
+            )
             responses.append(response)
         elif command.content.startswith("X"):
             if self.repository_port.delete_payment(int(command.content[1:])):
