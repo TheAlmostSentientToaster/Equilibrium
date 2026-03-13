@@ -50,6 +50,10 @@ class CommandServicePort(ABC):
     def command_add_payment(self, command: Command) -> int:
         pass
 
+    @abstractmethod
+    async def post_command_hints(self, token: str):
+        pass
+
 class MessageServicePort(ABC):
     @abstractmethod
     async def receive_message(self, content: str, user_id: int, user_name: str, chat_context: ChatContext):
@@ -81,6 +85,11 @@ class UserVerificationPort(ABC):
 class OutputMessagePort(ABC):
     @abstractmethod
     async def send_messages(self, messages: list[Message], chat_context: ChatContext):
+        pass
+
+class HttpOutboundPort(ABC):
+    @abstractmethod
+    async def post(self, url: str, json):
         pass
 
 class RepositoryPort(ABC):

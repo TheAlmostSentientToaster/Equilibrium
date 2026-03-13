@@ -1,15 +1,29 @@
 from domain.chat_context import ChatContext
 from domain.command import Command
-from application.ports import OutputMessagePort, CommandServicePort, RepositoryPort
+from application.ports import OutputMessagePort, CommandServicePort, RepositoryPort, HttpOutboundPort
 from domain.interfaces.balance_calculation_interface import BalanceCalculationInterface
 from domain.message import Message
 
 class CommandService(CommandServicePort):
-    def __init__(self, output_message_port: OutputMessagePort, balance_calculation_interface: BalanceCalculationInterface, repository_port: RepositoryPort,  message: type[Message]):
+    def __init__(self, output_message_port: OutputMessagePort, balance_calculation_interface: BalanceCalculationInterface, repository_port: RepositoryPort, http_outbound_port: HttpOutboundPort, message: type[Message]):
         self.output_message_port = output_message_port
         self.balance_calculation_interface = balance_calculation_interface
         self.repository_port = repository_port
         self.message = message
+        self.http_output_port = http_outbound_port
+
+    def post_command_hints(self, token: str):
+        url = f"https://api.telegram.org/bot{token}/setMyCommands"
+
+        commands = {
+            "commands": [
+                {"command": "balance", "description": "Shows the current balance between all contributors."},
+                {"command": "ping", "description": "Pings the server."},
+                {"command": "add_payment", "description": "Adds a payment without a receipt."}
+            ]
+        }
+
+        self.http_output_port.post(url=url, json=commands)
 
     async def handle_command(self, command: Command, chat_context: ChatContext):
         responses = list()
