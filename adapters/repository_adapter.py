@@ -119,10 +119,10 @@ class DbAdapter(RepositoryPort):
                                       )
         error_message = f"Payment deleted by User: {payment[0][0]}€"
 
-        if not payment:
+        if payment[0][0] is None:
             print("No payment returned.")
             return False
-        elif payment == "":
+        elif payment[0][0] == "":
             print("Payment already empty.")
             return False
         else:

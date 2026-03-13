@@ -26,6 +26,26 @@ class CommandServicePort(ABC):
     async def handle_command(self, command: Command, chat_context: ChatContext):
         pass
 
+    @abstractmethod
+    def command_ping(self) -> Message:
+        pass
+
+    @abstractmethod
+    def command_unknown(self) -> Message:
+        pass
+
+    @abstractmethod
+    def command_delete_payment(self, payment_id) -> Message:
+        pass
+
+    @abstractmethod
+    def command_start(self) -> Message:
+        pass
+
+    @abstractmethod
+    def command_balance(self, balances: list) -> list[Message]:
+        pass
+
 class MessageServicePort(ABC):
     @abstractmethod
     async def receive_message(self, content: str, user_id: int, user_name: str, chat_context: ChatContext):

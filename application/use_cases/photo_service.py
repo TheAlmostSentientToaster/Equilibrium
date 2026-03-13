@@ -21,7 +21,7 @@ class PhotoService(PhotoServicePort):
         payment_id = self.repository_port.save_photo(bill)
 
         if price:
-            message = f"You just paid {str(price)}\nIs that wrong? Press /X{payment_id}"
+            message = f"You just paid {str(price)}\nPress /X{payment_id} to delete Payment."
         else:
             message = 'Seems we could not find the total sum on the bill'
         await self.send_message(message, chat_context)
