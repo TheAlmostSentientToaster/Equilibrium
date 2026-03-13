@@ -25,8 +25,11 @@ class CommandService(CommandServicePort):
         elif command.content.startswith("X"):
             responses.append(self.command_delete_payment(command.content[1:]))
 
-        elif command.content.startswith("ping") or command.content.startswith("Ping"):
+        elif command.content.startswith("ping"):
             responses.append(self.command_ping())
+
+        elif command.content.startswith("add_payment"):
+            responses.append(self.command_add_payment(command))
 
         else:
             responses.append(self.command_unknown())
@@ -105,3 +108,24 @@ class CommandService(CommandServicePort):
             )
             messages.append(message)
         return messages
+
+    def command_add_payment(self, command: Command) -> Message:
+        amount = command.content.split()[1]
+        payment_id = self.repository_port.add_payment(command)
+
+        if payment_id:
+            message = self.message(
+                message_id=None,
+                user_id=None,
+                content=f"Payment of {amount}€ added successfully.\nPress /X{payment_id} to delete.",
+                user_name=None
+            )
+            return message
+        else:
+            message = self.message(
+                message_id=None,
+                user_id=None,
+                content=f"Adding payment failed.",
+                user_name=None
+            )
+            return message

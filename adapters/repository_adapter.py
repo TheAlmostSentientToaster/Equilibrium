@@ -6,6 +6,9 @@ from typing import Optional
 from PIL import Image
 from datetime import datetime
 
+from sympy.physics.units import amount
+
+from domain.command import Command
 from domain.photo import Photo
 from application.ports import RepositoryPort
 from domain.message import Message
@@ -138,6 +141,19 @@ class DbAdapter(RepositoryPort):
             else:
                 return False
 
+    def add_payment(self, command: Command) -> int:
+        command_parts = command.content.split()
+        amount = command_parts[1]
 
+        if len(command_parts) > 2:
+            comment = command_parts[2]
+        else:
+            comment = "No comment by User."
 
-
+        payment_id = self._execute_query(
+            "INSERT INTO Payments (User_id, Sum, Error) VALUES (?,?,?)",
+            (command.user_id, amount, "Payment added manually by user: " + comment),
+            fetch=False,
+            return_last_row_id=True
+        )
+        return payment_id

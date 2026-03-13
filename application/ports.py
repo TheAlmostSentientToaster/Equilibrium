@@ -46,6 +46,10 @@ class CommandServicePort(ABC):
     def command_balance(self, balances: list, deposits: list) -> list[Message]:
         pass
 
+    @abstractmethod
+    def command_add_payment(self, command: Command) -> int:
+        pass
+
 class MessageServicePort(ABC):
     @abstractmethod
     async def receive_message(self, content: str, user_id: int, user_name: str, chat_context: ChatContext):
@@ -102,4 +106,8 @@ class RepositoryPort(ABC):
 
     @abstractmethod
     def delete_payment(self, payment_id: int) -> bool:
+        pass
+
+    @abstractmethod
+    def add_payment(self, command: Command) -> int:
         pass
