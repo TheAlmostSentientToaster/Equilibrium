@@ -6,8 +6,6 @@ from typing import Optional
 from PIL import Image
 from datetime import datetime
 
-from sympy.physics.units import amount
-
 from domain.command import Command
 from domain.photo import Photo
 from application.ports import RepositoryPort
@@ -119,8 +117,17 @@ class DbAdapter(RepositoryPort):
             Where Payment_id = (?)
             """,
             (payment_id,)
-                                      )
-        error_message = f"Payment deleted by User: {payment[0][0]}€"
+        )
+
+        error_message = self._execute_query("""
+            SELECT Error
+            FROM Payments
+            WHERE Payment_id = (?)
+            """,
+            (payment_id,)
+        )
+
+        error_message = error_message[0][0] + f" Payment deleted by User: {payment[0][0]}€"
 
         if payment[0][0] is None:
             print("No payment returned.")
@@ -141,9 +148,14 @@ class DbAdapter(RepositoryPort):
             else:
                 return False
 
-    def add_payment(self, command: Command) -> int:
+    def add_payment(self, command: Command) -> Optional[int]:
         command_parts = command.content.split()
-        amount = command_parts[1]
+
+        try:
+            amount = int(command_parts[1])
+        except ValueError as e:
+            print(f"Value error: {e}")
+            return None
 
         if len(command_parts) > 2:
             comment = command_parts[2]

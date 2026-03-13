@@ -125,7 +125,7 @@ class CommandService(CommandServicePort):
             message = self.message(
                 message_id=None,
                 user_id=None,
-                content=f"Adding payment failed.",
+                content=f"Adding payment failed.\nSee logs for further information.",
                 user_name=None
             )
             return message
