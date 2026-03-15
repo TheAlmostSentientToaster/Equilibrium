@@ -35,7 +35,7 @@ class CommandServicePort(ABC):
         pass
 
     @abstractmethod
-    def command_delete_payment(self, payment_id) -> Message:
+    def command_delete_payment(self, command: Command) -> Message:
         pass
 
     @abstractmethod
@@ -114,7 +114,7 @@ class RepositoryPort(ABC):
         pass
 
     @abstractmethod
-    def delete_payment(self, payment_id: int) -> bool:
+    def delete_payment(self, command: Command) -> bool:
         pass
 
     @abstractmethod
