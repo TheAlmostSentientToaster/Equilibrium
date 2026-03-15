@@ -194,6 +194,9 @@ class DbAdapter(RepositoryPort):
                                     (payment_id,),
             fetch=True, return_last_row_id=False)
 
+        if error[0][0] is None:
+            error = [[""]]
+
         if self._execute_query("""
                         UPDATE Payments
                         SET Sum = ?, Error = ?
