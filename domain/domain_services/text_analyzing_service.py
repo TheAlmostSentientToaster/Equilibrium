@@ -1,4 +1,5 @@
 from config import Config
+from domain.bill_line import BillLine
 from domain.interfaces.text_analyzing_interface import TextAnalyzingInterface
 from rapidfuzz import fuzz
 
@@ -35,13 +36,17 @@ class TextAnalyzingService(TextAnalyzingInterface):
 
         return lines
 
-    def get_relevant_lines(self, lines_of_document: list[str]) -> list[str]:
+    def get_relevant_lines(self, lines_of_document: list[str]) -> list[BillLine]:
         keywords = self.config.KEYWORDS_FOR_PRICE_SEARCH.split(',')
         relevant_lines = []
 
         for line in lines_of_document:
+            bill_line = BillLine(line=line, key_words=[], numbers=[])
             for kw in keywords:
                 if fuzz.partial_ratio(kw.casefold(), line.casefold()) > 75:
-                    relevant_lines.append(line)
+                    bill_line.key_words.append(kw)
+
+            if len(bill_line.key_words) > 0:
+                relevant_lines.append(bill_line)
 
         return relevant_lines

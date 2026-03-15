@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 
+from domain.bill_line import BillLine
+
 
 class TextAnalyzingInterface(ABC):
     @abstractmethod
@@ -7,5 +9,5 @@ class TextAnalyzingInterface(ABC):
         pass
 
     @abstractmethod
-    def get_relevant_lines(self, all_lines: list[str]):
+    def get_relevant_lines(self, all_lines: list[str]) -> list[BillLine]:
         pass

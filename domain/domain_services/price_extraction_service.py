@@ -4,6 +4,7 @@ from typing import Optional
 from collections import Counter
 
 from config import Config
+from domain.bill_line import BillLine
 from domain.interfaces.image_processing_interface import ImageProcessingInterface
 from domain.interfaces.ocr_reading_interface import OcrReadingInterface
 from domain.interfaces.price_extraction_interface import PriceExtractionInterface
@@ -19,27 +20,24 @@ class PriceExtractionService(PriceExtractionInterface):
         self.text_analyzer = text_analyzer
         self. config = config
 
-    def extract_obvious_prices(self, line: str) -> list[float]:
-        candidates = self.num_like.findall(line)
-        prices = []
+    def extract_obvious_prices(self, line: BillLine):
+        candidates = self.num_like.findall(line.line)
 
         for c in candidates:
             norm = self.normalize_number_token(c)
             if re.fullmatch(r"\d{1,4}\.\d{2}", norm):
-                prices.append(float(norm))
+                line.numbers.append(float(norm))
 
-        return prices
-
-    def extract_not_so_obvious_prices(self, line: str) -> list[float]:
-        candidates = self.num_like.findall(line)
+    def extract_not_so_obvious_prices(self, line: BillLine):
+        candidates = self.num_like.findall(line.line)
 
         for c in candidates:
             norm = self.normalize_number_token(c)
             if re.fullmatch(r"\d{1,4}\.\d{2}", norm):
-                line = re.sub(c, "", line)
+                line.line = re.sub(c, "", line.line)
 
-        line = self.normalize_number_token(line)
-        return self.extract_obvious_prices(line)
+        line.line = self.normalize_number_token(line.line)
+        self.extract_obvious_prices(line)
 
     def normalize_number_token(self, token: str) -> str:
         token = (token
@@ -59,12 +57,37 @@ class PriceExtractionService(PriceExtractionInterface):
 
         return token
 
-    def extract_price_from_list(self, strings: list[str]) -> Optional[str]:
-        if not strings:
+    #A lot can be improved here
+    def extract_price_from_list(self, lines: list[BillLine]) -> Optional[str]:
+        if not lines:
             return None
 
-        counter = Counter(strings)
+        suspicious_lines = []
+        all_numbers =[]
+
+        for line in lines:
+            if line.key_words.__contains__("zu zahlen"):
+                suspicious_lines.append(line)
+            for number in line.numbers:
+                all_numbers.append(number)
+
+        if len(suspicious_lines) == 1:
+            if len(suspicious_lines[0].numbers) == 1:
+                return suspicious_lines[0].numbers[0]
+            if len(suspicious_lines[0].numbers) == 2:
+                return str(self.biggest(suspicious_lines[0].numbers))
+
+        counter = Counter(all_numbers)
         return counter.most_common(1)[0][0]
+
+    def biggest(self, numbers: list[float]) -> float:
+        champion = numbers[0]
+
+        for number in numbers:
+            if number > champion:
+                champion = number
+
+        return champion
 
     def extract_price_from_picture(self, picture: bytes) -> Optional[str]:
         possible_payments = []
@@ -72,9 +95,14 @@ class PriceExtractionService(PriceExtractionInterface):
         text_matrix = self.reader.read_text(picture)
         lines_of_document = self.text_analyzer.get_all_lines(text_matrix)
         relevant_lines = self.text_analyzer.get_relevant_lines(lines_of_document)
+
         for line in relevant_lines:
-            possible_payments = possible_payments + self.extract_obvious_prices(line)
-            possible_payments = possible_payments + self.extract_not_so_obvious_prices(line)
+            self.extract_obvious_prices(line)
+            self.extract_not_so_obvious_prices(line)
+
+            if len(line.numbers) > 0:
+                possible_payments.append(line)
+
         price = self.extract_price_from_list(possible_payments)
 
         return price
