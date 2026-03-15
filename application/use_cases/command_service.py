@@ -37,7 +37,7 @@ class CommandService(CommandServicePort):
             responses.append(self.command_start())
 
         elif command.content.startswith("X"):
-            responses.append(self.command_delete_payment(command.content[1:]))
+            responses.append(self.command_delete_payment(command))
 
         elif command.content.startswith("ping"):
             responses.append(self.command_ping())
@@ -71,8 +71,8 @@ class CommandService(CommandServicePort):
         )
         return response
 
-    def command_delete_payment(self, payment_id) -> Message:
-        if self.repository_port.delete_payment(int(payment_id)):
+    def command_delete_payment(self, command: Command) -> Message:
+        if self.repository_port.delete_payment(command):
             response = self.message(
                 message_id=None,
                 content="Payment deleted successfully.",

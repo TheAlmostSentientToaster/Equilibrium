@@ -110,7 +110,15 @@ class DbAdapter(RepositoryPort):
             deposits.append((result[1], result[2]))
         return deposits
 
-    def delete_payment(self, payment_id: int) -> bool:
+    def delete_payment(self, command: Command) -> bool:
+        content_split = command.content.split()
+        payment_id = content_split[0][1:]
+
+        if len(content_split) > 1:
+            comment = "User comment: " + " ".join(content_split[1:]) + "\n"
+        else:
+            comment = ""
+
         payment = self._execute_query("""
             SELECT Sum
             From Payments
@@ -127,7 +135,10 @@ class DbAdapter(RepositoryPort):
             (payment_id,)
         )
 
-        error_message = error_message[0][0] + f" Payment deleted by User: {payment[0][0]}€\n"
+        if error_message[0][0] is None:
+            error_message = [("",)]
+
+        error_message = error_message[0][0] + f" Payment deleted by User: {payment[0][0]}€\n{comment}"
 
         if payment[0][0] is None:
             print("No payment returned.")
