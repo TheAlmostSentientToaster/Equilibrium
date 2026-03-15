@@ -6,7 +6,7 @@ class TextAnalyzingService(TextAnalyzingInterface):
     def __init__(self, config: Config):
         self.config = config
 
-    def overlap_satisfied(self, a, b):
+    def overlap_satisfied(self, a, b) -> bool:
         height_a = a[0][3][1] - a[0][0][1]
         height_b = b[0][3][1] - b[0][0][1]
         overlap = a[0][3][1] - b[0][0][1]
