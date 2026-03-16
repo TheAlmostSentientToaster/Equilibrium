@@ -26,6 +26,13 @@ class PhotoService(PhotoServicePort):
             message = 'Seems we could not find the total sum on the bill'
         await self.send_message(message, chat_context)
 
+        if price:
+            message = f"{user_name} just paid {str(price)}€\nPress /D{payment_id} to show it."
+            users = self.repository_port.get_all_users()
+            users.remove(user_id)
+            await self.output_message_port.send_broadcast([Message(None, message, None, None)], users)
+
+
     async def send_message(self, message: str, chat_context: ChatContext):
         message = Message(message_id=None, content=message, user_id= None, user_name=None)
         messages = [message]

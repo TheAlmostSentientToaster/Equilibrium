@@ -17,9 +17,9 @@ class CommandService(CommandServicePort):
 
         commands = {
             "commands": [
-                {"command": "balance", "description": "Shows the current balance between all contributors."},
+                {"command": "balance", "description": "Shows current balance between contributors."},
                 {"command": "ping", "description": "Pings the server."},
-                {"command": "add_payment", "description": "Hold command and add an amount and comment."}
+                {"command": "add_payment", "description": "Hold and add amount and comment."}
             ]
         }
 
@@ -37,16 +37,16 @@ class CommandService(CommandServicePort):
             responses.append(self.command_start())
 
         elif command.content.startswith("X"):
-            responses.append(self.command_delete_payment(command))
+            responses.append(await self.command_delete_payment(command))
 
         elif command.content.startswith("ping"):
             responses.append(self.command_ping())
 
         elif command.content.startswith("add_payment"):
-            responses.append(self.command_add_payment(command))
+            responses.append(await self.command_add_payment(command))
 
         elif command.content.startswith("C"):
-            responses.append(self.command_change_payment(command))
+            responses.append(await self.command_change_payment(command))
 
         else:
             responses.append(self.command_unknown())
@@ -71,8 +71,12 @@ class CommandService(CommandServicePort):
         )
         return response
 
-    def command_delete_payment(self, command: Command) -> Message:
-        if self.repository_port.delete_payment(command):
+    async def command_delete_payment(self, command: Command) -> Message:
+        content_split = command.content.split()
+        payment_id = content_split[0][1:]
+
+        deletion_success = self.repository_port.delete_payment(command)
+        if deletion_success:
             response = self.message(
                 message_id=None,
                 content="Payment deleted successfully.",
@@ -86,6 +90,13 @@ class CommandService(CommandServicePort):
                 user_id=None,
                 user_name=None
             )
+
+        if deletion_success:
+            broadcast_message = f"{command.user_name} just deleted payment {str(payment_id)}\n"
+            users = self.repository_port.get_all_users()
+            users.remove(command.user_id)
+            await self.output_message_port.send_broadcast([Message(None, broadcast_message, None, None)], users)
+
         return response
 
     def command_start(self) -> Message:
@@ -126,7 +137,7 @@ class CommandService(CommandServicePort):
             messages.append(message)
         return messages
 
-    def command_add_payment(self, command: Command) -> Message:
+    async def command_add_payment(self, command: Command) -> Message:
         content_split = command.content.split()
 
         if len(content_split) < 2:
@@ -149,7 +160,6 @@ class CommandService(CommandServicePort):
                 content=f"Payment of {amount}€ added successfully.\nPress /X{payment_id} to delete.\nHold /C{payment_id} to change the amount.",
                 user_name=None
             )
-            return message
         else:
             message = self.message(
                 message_id=None,
@@ -157,10 +167,18 @@ class CommandService(CommandServicePort):
                 content=f"Adding payment failed.\nSee logs for further information.",
                 user_name=None
             )
-            return message
 
-    def command_change_payment(self, command: Command) -> Message:
+        if payment_id:
+            broadcast_message = f"{command.user_name} just added {str(amount)}€\n"
+            users = self.repository_port.get_all_users()
+            users.remove(command.user_id)
+            await self.output_message_port.send_broadcast([Message(None, broadcast_message, None, None)], users)
+
+        return message
+
+    async def command_change_payment(self, command: Command) -> Message:
         content_split = command.content.split()
+        payment_id = content_split[0][1:]
 
         if len(content_split) < 2:
             message = self.message(
@@ -172,15 +190,15 @@ class CommandService(CommandServicePort):
             return message
 
         amount = content_split[1]
-        
-        if self.repository_port.change_payment(command):
+
+        change_success = self.repository_port.change_payment(command)
+        if change_success:
             message = self.message(
                 message_id=None,
                 user_id=None,
                 content=f"Payment changed to {amount}",
                 user_name=None
             )
-            return message
         else:
             message = self.message(
                 message_id=None,
@@ -188,4 +206,11 @@ class CommandService(CommandServicePort):
                 content=f"Changing payment failed.\nSee logs for further information.",
                 user_name=None
             )
-            return message
+
+        if change_success:
+            broadcast_message = f"{command.user_name} just changed payment {payment_id} to {str(amount)}€\n"
+            users = self.repository_port.get_all_users()
+            users.remove(command.user_id)
+            await self.output_message_port.send_broadcast([Message(None, broadcast_message, None, None)], users)
+
+        return message

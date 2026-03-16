@@ -87,6 +87,10 @@ class OutputMessagePort(ABC):
     async def send_messages(self, messages: list[Message], chat_context: ChatContext):
         pass
 
+    @abstractmethod
+    async def send_broadcast(self, messages: list[Message], users: list[int]):
+        pass
+
 class HttpOutboundPort(ABC):
     @abstractmethod
     async def post(self, url: str, json):
@@ -123,4 +127,8 @@ class RepositoryPort(ABC):
 
     @abstractmethod
     def change_payment(self, command: Command) -> bool:
+        pass
+
+    @abstractmethod
+    def get_all_users(self) -> list[int]:
         pass
