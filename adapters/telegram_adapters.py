@@ -63,3 +63,7 @@ class TelegramOutboundAdapter(OutputMessagePort):
             chat_id=chat_context.chat_id,
             text=response
         )
+
+    async def send_broadcast(self, messages: list[Message], users: list[int]):
+        for user in users:
+            await self.send_messages(messages, ChatContext(user))

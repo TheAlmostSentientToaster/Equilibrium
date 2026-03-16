@@ -220,3 +220,17 @@ class DbAdapter(RepositoryPort):
             return True
         else:
             return False
+
+    def get_all_users(self) -> list[int]:
+        users = self._execute_query("""
+            SELECT User_id
+            FROM Users
+            """,
+            fetch=True,
+            return_last_row_id=False)
+
+        user_ids = []
+        for user in users:
+            user_ids.append(user[0])
+
+        return user_ids
