@@ -212,7 +212,7 @@ class CommandService(CommandServicePort):
             )
 
         if change_success:
-            broadcast_message = f"{command.user_name} just changed payment {payment_id} to {str(amount)}€\n"
+            broadcast_message = f"{command.user_name} just changed payment {payment_id} to {str(amount)}€\nPress /D{payment_id} to show it.\n"
             users = self.repository_port.get_all_users()
             users.remove(command.user_id)
             await self.output_message_port.send_broadcast([Message(None, broadcast_message, None, None)], users)
