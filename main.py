@@ -25,7 +25,7 @@ config.validate()
 TOKEN = config.TELEGRAM_TOKEN
 
 app = ApplicationBuilder().token(TOKEN).build()
-bot = Bot(token=TOKEN, request=HTTPXRequest(connect_timeout=10.0, read_timeout=10.0))
+bot = Bot(token=TOKEN, request=HTTPXRequest(connect_timeout=20.0, read_timeout=20.0))
 reader = easyocr.Reader([config.OCR_LANGUAGE])
 
 db_adapter = DbAdapter(config.IMAGE_PATH)
