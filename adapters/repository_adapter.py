@@ -234,3 +234,14 @@ class DbAdapter(RepositoryPort):
             user_ids.append(user[0])
 
         return user_ids
+
+    def get_bill_path(self, payment_id: int) -> str:
+        bill_path = self._execute_query("""
+            SELECT Image_path
+            FROM Payments
+            WHERE Payment_id = ?
+            """,
+            (payment_id,),
+            fetch=True,
+            return_last_row_id=False)
+        return bill_path[0][0]

@@ -48,6 +48,10 @@ class CommandService(CommandServicePort):
         elif command.content.startswith("C"):
             responses.append(await self.command_change_payment(command))
 
+        elif command.content.startswith("D"):
+            responses.append(await self.command_display_bill(command))
+            return
+
         else:
             responses.append(self.command_unknown())
 
@@ -214,3 +218,9 @@ class CommandService(CommandServicePort):
             await self.output_message_port.send_broadcast([Message(None, broadcast_message, None, None)], users)
 
         return message
+
+    async def command_display_bill(self, command: Command):
+        payment_id = command.content[1:]
+        picture_path = self.repository_port.get_bill_path(int(payment_id))
+        await self.output_message_port.send_image(picture_path, ChatContext(command.user_id))
+        pass
