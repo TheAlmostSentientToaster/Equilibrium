@@ -2,6 +2,7 @@ import easyocr
 
 from telegram import Bot
 from telegram.ext import ApplicationBuilder, MessageHandler, filters
+from telegram.request import HTTPXRequest
 
 from adapters.http_adapters import HttpOutboundAdapter
 from application.use_cases.command_service import CommandService
@@ -24,7 +25,7 @@ config.validate()
 TOKEN = config.TELEGRAM_TOKEN
 
 app = ApplicationBuilder().token(TOKEN).build()
-bot = Bot(token=TOKEN)
+bot = Bot(token=TOKEN, request=HTTPXRequest(connect_timeout=10.0, read_timeout=10.0))
 reader = easyocr.Reader([config.OCR_LANGUAGE])
 
 db_adapter = DbAdapter(config.IMAGE_PATH)

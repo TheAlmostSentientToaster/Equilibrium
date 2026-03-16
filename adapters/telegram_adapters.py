@@ -67,3 +67,9 @@ class TelegramOutboundAdapter(OutputMessagePort):
     async def send_broadcast(self, messages: list[Message], users: list[int]):
         for user in users:
             await self.send_messages(messages, ChatContext(user))
+
+    async def send_image(self, image_path: str, chat_context: ChatContext):
+        await self.bot.send_photo(
+            chat_id=chat_context.chat_id,
+            photo=image_path
+        )

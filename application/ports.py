@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Optional
+from PIL import Image
 
 from domain.chat_context import ChatContext
 from domain.message import Message
@@ -54,6 +55,10 @@ class CommandServicePort(ABC):
     async def post_command_hints(self, token: str):
         pass
 
+    @abstractmethod
+    async def command_display_bill(self, command: Command):
+        pass
+
 class MessageServicePort(ABC):
     @abstractmethod
     async def receive_message(self, content: str, user_id: int, user_name: str, chat_context: ChatContext):
@@ -90,6 +95,11 @@ class OutputMessagePort(ABC):
     @abstractmethod
     async def send_broadcast(self, messages: list[Message], users: list[int]):
         pass
+
+    @abstractmethod
+    async def send_image(self, image: Image, chat_context: ChatContext):
+        pass
+
 
 class HttpOutboundPort(ABC):
     @abstractmethod
@@ -131,4 +141,8 @@ class RepositoryPort(ABC):
 
     @abstractmethod
     def get_all_users(self) -> list[int]:
+        pass
+
+    @abstractmethod
+    def get_bill_path(self, payment_id: int) -> str:
         pass
