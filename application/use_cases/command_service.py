@@ -196,6 +196,7 @@ class CommandService(CommandServicePort, BaseService):
         amount = content_split[1]
 
         change_success = self.repository_port.change_payment(command)
+
         if change_success:
             message = self.message(
                 message_id=None,
@@ -212,7 +213,11 @@ class CommandService(CommandServicePort, BaseService):
             )
 
         if change_success:
-            broadcast_message = Message(None, f"{command.user_name} just changed payment {payment_id} to {str(amount)}€\nPress /D{payment_id} to show it.\n", None, None)
+            broadcast_message = Message(None, f"{command.user_name} just changed payment {payment_id} to {str(amount)}€\n", None, None)
+            has_image = self.repository_port.get_bill_path(int(payment_id))
+
+            if has_image is not None:
+                broadcast_message.content = broadcast_message.content + "Press /D{payment_id} to show it.\n"
             await self.send_broadcast(broadcast_message, [command.user_id])
 
         return message
