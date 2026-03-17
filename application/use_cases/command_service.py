@@ -1,11 +1,13 @@
+from application.use_cases.base_service import BaseService
 from domain.chat_context import ChatContext
 from domain.command import Command
 from application.ports import OutputMessagePort, CommandServicePort, RepositoryPort, HttpOutboundPort
 from domain.interfaces.balance_calculation_interface import BalanceCalculationInterface
 from domain.message import Message
 
-class CommandService(CommandServicePort):
+class CommandService(CommandServicePort, BaseService):
     def __init__(self, output_message_port: OutputMessagePort, balance_calculation_interface: BalanceCalculationInterface, repository_port: RepositoryPort, http_outbound_port: HttpOutboundPort, message: type[Message]):
+        BaseService.__init__(self, output_message_port, repository_port)
         self.output_message_port = output_message_port
         self.balance_calculation_interface = balance_calculation_interface
         self.repository_port = repository_port
@@ -173,10 +175,8 @@ class CommandService(CommandServicePort):
             )
 
         if payment_id:
-            broadcast_message = f"{command.user_name} just added {str(amount)}€\n"
-            users = self.repository_port.get_all_users()
-            users.remove(command.user_id)
-            await self.output_message_port.send_broadcast([Message(None, broadcast_message, None, None)], users)
+            broadcast_message = Message(None, f"{command.user_name} just added {str(amount)}€\n", None, None)
+            await self.send_broadcast(broadcast_message, [command.user_id])
 
         return message
 
@@ -212,10 +212,8 @@ class CommandService(CommandServicePort):
             )
 
         if change_success:
-            broadcast_message = f"{command.user_name} just changed payment {payment_id} to {str(amount)}€\nPress /D{payment_id} to show it.\n"
-            users = self.repository_port.get_all_users()
-            users.remove(command.user_id)
-            await self.output_message_port.send_broadcast([Message(None, broadcast_message, None, None)], users)
+            broadcast_message = Message(None, f"{command.user_name} just changed payment {payment_id} to {str(amount)}€\nPress /D{payment_id} to show it.\n", None, None)
+            await self.send_broadcast(broadcast_message, [command.user_id])
 
         return message
 
