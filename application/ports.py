@@ -73,17 +73,9 @@ class PhotoServicePort(ABC):
     async def receive_photo(self, photo: bytearray, user_id: int, user_name: str, chat_context: ChatContext):
         pass
 
-    @abstractmethod
-    async def send_message(self, message: str, chat_context: ChatContext):
-        pass
-
 class UserVerificationPort(ABC):
     @abstractmethod
     async def verify_user(self, user_id: int, chat_context: ChatContext):
-        pass
-
-    @abstractmethod
-    async def send_message(self, message: str, chat_context: ChatContext):
         pass
 
 #Driving Ports
