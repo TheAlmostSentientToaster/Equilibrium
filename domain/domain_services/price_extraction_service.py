@@ -84,14 +84,10 @@ class PriceExtractionService(PriceExtractionInterface):
 
         return champion
 
-    def extract_price_from_picture(self, picture: bytes) -> Optional[str]:
+    def orchestrating_price_extraction_from_lines(self, lines: list[BillLine]) -> list[BillLine]:
         possible_payments = []
 
-        text_matrix = self.reader.read_text(picture)
-        lines_of_document = self.text_analyzer.get_all_lines(text_matrix)
-        relevant_lines = self.text_analyzer.get_relevant_lines(lines_of_document)
-
-        for line in relevant_lines:
+        for line in lines:
             temp_line = line
             line = self.extract_prices_from_line(line)
 
@@ -106,6 +102,15 @@ class PriceExtractionService(PriceExtractionInterface):
 
             if len(line.numbers) > 0:
                 possible_payments.append(line)
+
+        return possible_payments
+
+    def extract_price_from_picture(self, picture: bytes) -> Optional[str]:
+        text_matrix = self.reader.read_text(picture)
+        lines_of_document = self.text_analyzer.get_all_lines(text_matrix)
+        relevant_lines = self.text_analyzer.get_relevant_lines(lines_of_document)
+
+        possible_payments = self.orchestrating_price_extraction_from_lines(relevant_lines)
 
         price = self.extract_price_from_list(possible_payments)
 
