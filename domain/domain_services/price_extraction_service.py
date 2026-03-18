@@ -20,24 +20,17 @@ class PriceExtractionService(PriceExtractionInterface):
         self.text_analyzer = text_analyzer
         self. config = config
 
-    def extract_obvious_prices(self, line: BillLine):
+    def extract_prices_from_line(self, line: BillLine) -> BillLine:
         candidates = self.num_like.findall(line.line)
+        new_line = BillLine(line.line, line.key_words, line.numbers)
 
         for c in candidates:
             norm = self.normalize_number_token(c)
             if re.fullmatch(r"\d{1,4}\.\d{2}", norm):
-                line.numbers.append(float(norm))
+                new_line.numbers.append(float(norm))
+                new_line.line = new_line.line.replace(norm, "|")
 
-    def extract_not_so_obvious_prices(self, line: BillLine):
-        candidates = self.num_like.findall(line.line)
-
-        for c in candidates:
-            norm = self.normalize_number_token(c)
-            if re.fullmatch(r"\d{1,4}\.\d{2}", norm):
-                line.line = re.sub(c, "", line.line)
-
-        line.line = self.normalize_number_token(line.line)
-        self.extract_obvious_prices(line)
+        return new_line
 
     def normalize_number_token(self, token: str) -> str:
         token = (token
@@ -48,7 +41,9 @@ class PriceExtractionService(PriceExtractionInterface):
                  .replace("S", "5")
                  .replace(",", ".")
                  )
+        return token
 
+    def normalize_spaces(self, token: str) -> str:
         token = re.sub(r"(\d)\s\.\s(\d)", r"\1.\2", token)
         token = re.sub(r"(\d)\.\s(\d)", r"\1.\2", token)
         token = re.sub(r"(\d)\s\.(\d)", r"\1.\2", token)
@@ -97,8 +92,17 @@ class PriceExtractionService(PriceExtractionInterface):
         relevant_lines = self.text_analyzer.get_relevant_lines(lines_of_document)
 
         for line in relevant_lines:
-            self.extract_obvious_prices(line)
-            self.extract_not_so_obvious_prices(line)
+            temp_line = line
+            line = self.extract_prices_from_line(line)
+
+            line.line = self.normalize_spaces(line.line)
+            line = self.extract_prices_from_line(line)
+
+            line.line = self.normalize_number_token(line.line)
+            line.line = self.normalize_spaces(line.line)
+            line = self.extract_prices_from_line(line)
+
+            line.line = temp_line.line
 
             if len(line.numbers) > 0:
                 possible_payments.append(line)
