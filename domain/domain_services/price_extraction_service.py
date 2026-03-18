@@ -39,6 +39,7 @@ class PriceExtractionService(PriceExtractionInterface):
                  .replace("I", "1")
                  .replace("l", "1")
                  .replace("S", "5")
+                 .replace("s", "5")
                  .replace(",", ".")
                  )
         return token
@@ -73,7 +74,7 @@ class PriceExtractionService(PriceExtractionInterface):
                 return str(self.biggest(suspicious_lines[0].numbers))
 
         counter = Counter(all_numbers)
-        return counter.most_common(1)[0][0]
+        return str(counter.most_common(1)[0][0])
 
     def biggest(self, numbers: list[float]) -> float:
         champion = numbers[0]
@@ -84,7 +85,7 @@ class PriceExtractionService(PriceExtractionInterface):
 
         return champion
 
-    def orchestrating_price_extraction_from_lines(self, lines: list[BillLine]) -> list[BillLine]:
+    def orchestrate_price_extraction_from_lines(self, lines: list[BillLine]) -> list[BillLine]:
         possible_payments = []
 
         for line in lines:
@@ -110,7 +111,7 @@ class PriceExtractionService(PriceExtractionInterface):
         lines_of_document = self.text_analyzer.get_all_lines(text_matrix)
         relevant_lines = self.text_analyzer.get_relevant_lines(lines_of_document)
 
-        possible_payments = self.orchestrating_price_extraction_from_lines(relevant_lines)
+        possible_payments = self.orchestrate_price_extraction_from_lines(relevant_lines)
 
         price = self.extract_price_from_list(possible_payments)
 
