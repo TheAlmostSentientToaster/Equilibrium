@@ -119,9 +119,9 @@ class PriceExtractionService(PriceExtractionInterface):
 
     def coordinate_price_search(self, photo: bytearray) -> Optional[float]:
         photo = bytes(photo)
-        price = self.extract_price_from_picture(photo)
-        if price is None:
-            picture_processed = self.image_processor.preprocess(photo)
-            price = self.extract_price_from_picture(picture_processed)
+        #price = self.extract_price_from_picture(photo)
+        #if price is None:
+        picture_processed = self.image_processor.preprocess(photo)
+        price = self.extract_price_from_picture(picture_processed)
 
         return float(price) if price is not None else None

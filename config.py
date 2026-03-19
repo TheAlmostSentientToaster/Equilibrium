@@ -11,6 +11,7 @@ class Config:
     KEYWORDS_FOR_PRICE_SEARCH = os.getenv('KEYWORDS_FOR_PRICE_SEARCH')
     IMAGE_PATH = os.getenv('IMAGES_PATH')
     USER_WHITELIST = os.getenv('USER_WHITELIST')
+    IMAGE_TESTING_DB_PATH = os.getenv('IMAGE_TESTING_DB_PATH')
 
     @classmethod
     def validate(cls):
@@ -26,3 +27,5 @@ class Config:
             raise ValueError("IMAGE_PATH environment variable is required")
         if not cls.USER_WHITELIST:
             raise ValueError("USER_WHITELIST environment variable is required")
+        if not cls.IMAGE_TESTING_DB_PATH:
+            raise ValueError("IMAGE_TESTING_DB_PATH environment variable is required")
