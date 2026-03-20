@@ -22,15 +22,16 @@ class TextAnalyzingService(TextAnalyzingInterface):
         current_line = "" + text_matrix[0][1]
 
         for i in range(len(text_matrix)):
+            token = text_matrix[i][1]
             if i + 1 == len(text_matrix):
-                current_line = current_line + " " + text_matrix[i][1]
+                current_line = current_line + " " + token
                 lines.append(current_line)
                 break
 
             if self.overlap_satisfied(text_matrix[i], text_matrix[i + 1]):
-                current_line = current_line + " " + text_matrix[i][1]
+                current_line = current_line + " " + token
             else:
-                current_line = current_line + " " + text_matrix[i][1]
+                current_line = current_line + " " + token
                 lines.append(current_line)
                 current_line = ""
 
