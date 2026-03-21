@@ -83,6 +83,9 @@ class TestPriceExtractionPerformance:
         failed_cases = []
 
         for path, feature in paths_and_features:
+
+            logger.info(f"Testing {path}")
+
             image = self.get_testing_image(path)
             price = price_extraction_service.coordinate_price_search(image)
 
