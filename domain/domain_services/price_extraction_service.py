@@ -92,7 +92,6 @@ class PriceExtractionService(PriceExtractionInterface):
 
         return token
 
-    #A lot can be improved here
     def extract_price_from_list(self, lines: list[BillLine]) -> Optional[str]:
         if not lines:
             return None
