@@ -27,9 +27,11 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: Repository in lowercase umwandeln
+      run: echo "REPO=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
+
     - name: Build Image
-      run: |
-        docker build -t ghcr.io/${{ github.repository }}:latest .
+      run: docker build -t ghcr.io/${REPO}:latest .
 
     - name: Push Image
       run: |
