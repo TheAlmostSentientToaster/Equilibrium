@@ -1,7 +1,6 @@
 services:
   equilibrium-bot:
-    build: .
-    image: ghcr.io/thealmostsentienttoaster
+    image: ghcr.io/thealmostsentienttoaster/equilibrium-bot
     container_name: equilibrium-bot
     restart: unless-stopped
     env_file:
