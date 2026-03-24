@@ -62,7 +62,7 @@ class CommandService(CommandServicePort, BaseService):
     def command_ping(self) -> Message:
         response = self.message(
                 message_id=None,
-                content="Pong!",
+                content="Ping!",
                 user_id=None,
                 user_name=None
         )
