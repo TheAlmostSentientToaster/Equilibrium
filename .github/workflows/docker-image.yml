@@ -27,7 +27,7 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Repository in lowercase umwandeln
+    - name: lowercase Repository
       run: echo "REPO=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
 
     - name: Build Image

@@ -1,0 +1,7 @@
+.venv
+.git
+.gitignore
+README.md
+.DS_Store
+.env
+.idea/

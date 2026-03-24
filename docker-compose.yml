@@ -1,0 +1,10 @@
+services:
+  equilibrium-bot:
+    build: .
+    image: ghcr.io/thealmostsentienttoaster
+    container_name: equilibrium-bot
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
