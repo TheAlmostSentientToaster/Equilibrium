@@ -26,6 +26,7 @@ class TestPriceExtractionService:
     @pytest.fixture
     def mock_config(self):
         config = Mock(spec=Config)
+        config.KEYWORDS_FOR_PRICE_SEARCH = "zu zahlen,summe,gesamt,total,betrag"
         return config
     
     @pytest.fixture
@@ -38,7 +39,7 @@ class TestPriceExtractionService:
         )
 
     def test_extract_prices_from_line_with_valid_prices(self, price_service):
-        line = BillLine(line="Summe 12.34 netto 5,67", key_words=[], numbers=[])
+        line = BillLine(line="Summe 12.34 netto 5,67", key_words=["summe"], numbers=[])
         
         new_line = price_service.extract_prices_from_line(line)
         
@@ -91,16 +92,18 @@ class TestPriceExtractionService:
 
     def test_orchestrate_price_extraction_from_lines_in_complex_case(self, price_service):
         lines = [
-            BillLine(line="Total 12 54 after Il S4", key_words=[], numbers=[]),
-            BillLine(line="haha 33.47 dramalama", key_words=[], numbers=[]),
+            BillLine(line="Total 12 54 after Il S4", key_words=["total"], numbers=[]),
+            BillLine(line="Summe 33.47 dramalama", key_words=["summe"], numbers=[]),
             BillLine(line="Hier gibt es keine Zahlungen.", key_words=[], numbers=[])
         ]
 
         resulting_lines = price_service.orchestrate_price_extraction_from_lines(lines)
 
         assert len(resulting_lines) == 2
-        assert len(resulting_lines[0].numbers) == 2
-        assert len(resulting_lines[1].numbers) == 1
+        assert len(resulting_lines[0]) == 2
+        assert resulting_lines[1] == False
+        assert len(resulting_lines[0][0].numbers) == 2
+        assert len(resulting_lines[0][1].numbers) == 1
 
     def test_extract_price_from_list_empty_list(self, price_service):
         result = price_service.extract_price_from_list([])
