@@ -17,6 +17,6 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     command: >
-      --schedule "0 23 * * *"
+      --schedule "* * * * *"
       --cleanup
       --label-enable
