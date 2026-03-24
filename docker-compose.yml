@@ -7,3 +7,16 @@ services:
       - .env
     ports:
       - "8080:8080"
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: >
+      --schedule "0 23 * * *"
+      --cleanup
+      --label-enable
