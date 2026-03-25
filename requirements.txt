@@ -7,3 +7,6 @@ python-dotenv
 rapidfuzz
 requests
 pytest
+pytest-cov
+pytest-mock
+pytest-asyncio
