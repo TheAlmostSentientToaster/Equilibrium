@@ -93,6 +93,7 @@ class TestPriceExtractionService:
     def test_orchestrate_price_extraction_from_lines_in_complex_case(self, price_service):
         lines = [
             BillLine(line="Total 12 54 after Il S4", key_words=["total"], numbers=[]),
+            BillLine(line="Zu zahlen Il S4", key_words=["zu zahlen"], numbers=[]),
             BillLine(line="Summe 33.47 dramalama", key_words=["summe"], numbers=[]),
             BillLine(line="Hier gibt es keine Zahlungen.", key_words=[], numbers=[])
         ]
@@ -100,10 +101,11 @@ class TestPriceExtractionService:
         resulting_lines = price_service.orchestrate_price_extraction_from_lines(lines)
 
         assert len(resulting_lines) == 2
-        assert len(resulting_lines[0]) == 2
+        assert len(resulting_lines[0]) == 3
         assert resulting_lines[1] == False
-        assert len(resulting_lines[0][0].numbers) == 2
+        assert len(resulting_lines[0][0].numbers) == 1
         assert len(resulting_lines[0][1].numbers) == 1
+        assert len(resulting_lines[0][2].numbers) == 1
 
     def test_extract_price_from_list_empty_list(self, price_service):
         result = price_service.extract_price_from_list([])
@@ -157,7 +159,7 @@ class TestPriceExtractionService:
         
         result = price_service.extract_price_from_picture(picture_data)
         
-        assert result == "12.34"
+        assert result[0] == "12.34"
         mock_ocr_reader.read_text.assert_called_once_with(picture_data)
         mock_text_analyzer.get_all_lines.assert_called_once_with(text_matrix)
         mock_text_analyzer.get_relevant_lines.assert_called_once_with(lines)
@@ -174,7 +176,7 @@ class TestPriceExtractionService:
         
         result = price_service.extract_price_from_picture(picture_data)
         
-        assert result is None
+        assert result[0] is None
 
     def test_coordinate_price_search_success_first_attempt(self, price_service, mock_ocr_reader, mock_text_analyzer):
         photo = bytearray(b"fake_image_data")
