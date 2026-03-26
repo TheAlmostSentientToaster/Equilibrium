@@ -217,7 +217,7 @@ class CommandService(CommandServicePort, BaseService):
             has_image = self.repository_port.get_bill_path(int(payment_id))
 
             if has_image is not None:
-                broadcast_message.content = broadcast_message.content + "Press /D{payment_id} to show it.\n"
+                broadcast_message.content = broadcast_message.content + f"Press /D{payment_id} to show it.\n"
             await self.send_broadcast(broadcast_message, [command.user_id])
 
         return message
