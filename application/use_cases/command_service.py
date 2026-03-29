@@ -136,7 +136,7 @@ class CommandService(CommandServicePort, BaseService):
         for balance in balances:
             message = self.message(
                 message_id=None,
-                content=balance[0] + " has left to spend: " + str( -1 * balance[1] * 2) + f"€,\nrespectively to pay back {-1 * balance[1]}€.\n",
+                content=balance[0] + " has left to spend: " + str( -1 * balance[1] * 2) + f"€,\nrespectively to pay back: {-1 * balance[1]}€.\n",
                 user_id=None,
                 user_name=None
             )
