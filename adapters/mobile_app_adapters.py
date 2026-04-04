@@ -14,6 +14,16 @@ class MobileAppOutboundAdapter(OutputMessagePort):
         pass
 
 class MobileAppInboundAdapter(InputMessagePort):
+    def __init__(self,
+                 message_service,
+                 photo_service,
+                 command_service,
+                 user_verification_service):
+        self.message_service = message_service
+        self.photo_service = photo_service
+        self.command_service = command_service
+        self.user_verification_service = user_verification_service
+
     def receive_photo(self, photo_data: bytearray, user_id: int, user_name: str, chat_context: ChatContext):
         pass
 
