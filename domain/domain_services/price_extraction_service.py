@@ -179,8 +179,8 @@ class PriceExtractionService(PriceExtractionInterface):
         relevant_lines_without_whitespaces = [BillLine(line.line.replace(" ", ""), line.key_words, line.numbers) for line in relevant_lines]
         extracts_without_whitespaces = self.orchestrate_price_extraction_from_lines(relevant_lines_without_whitespaces)
         for line in extracts_without_whitespaces[0]:
-            arsch = line.line
-            possible_payments.append(line)
+            if not any(all(num in payment.numbers for num in line.numbers) for payment in possible_payments):
+                possible_payments.append(line)
 
         extracted_price = self.extract_price_from_list(possible_payments)
         if extracted_price is not None:

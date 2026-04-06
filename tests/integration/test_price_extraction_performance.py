@@ -87,6 +87,7 @@ class TestPriceExtractionPerformance:
             logger.info(f"Testing {path}")
 
             image = self.get_testing_image(path)
+            #image = self.get_testing_image("tests/fixtures/Test_images/Zettel_3.png")
             price = price_extraction_service.coordinate_price_search(image)
 
             if price == feature:
