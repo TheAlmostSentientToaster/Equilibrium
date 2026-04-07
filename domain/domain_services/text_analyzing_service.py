@@ -43,8 +43,9 @@ class TextAnalyzingService(TextAnalyzingInterface):
 
         for line in lines_of_document:
             bill_line = BillLine(line=line, key_words=[], numbers=[])
+            line_without_spaces = line.replace(" ", "")
             for kw in keywords:
-                if fuzz.partial_ratio(kw.casefold(), line.casefold()) > 75:
+                if fuzz.partial_ratio(kw.casefold(), line.casefold()) > 75 or fuzz.partial_ratio(kw.casefold(), line_without_spaces.casefold()) > 75:
                     bill_line.key_words.append(kw)
 
             if len(bill_line.key_words) > 0:
