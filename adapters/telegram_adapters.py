@@ -13,8 +13,8 @@ class TelegramInboundAdapter(InputMessagePort):
                  command_service: CommandServicePort,
                  user_verification_service: UserVerificationPort,
                  application: Application):
-        self.message_service = message_service.receive_message
-        self.photo_service = photo_service.receive_photo
+        self.message_service = message_service
+        self.photo_service = photo_service
         self.command_service = command_service
         self.user_verification_service = user_verification_service
         self.application = application
@@ -44,10 +44,10 @@ class TelegramInboundAdapter(InputMessagePort):
                 await self.receive_message(content, user_id, user_name, chat_context)
 
     async def receive_photo(self, photo_data: bytearray, user_id: int, user_name: str, chat_context: ChatContext):
-        await self.photo_service(photo=photo_data, user_id=user_id, user_name=user_name, chat_context=chat_context)
+        await self.photo_service.receive_photo(photo=photo_data, user_id=user_id, user_name=user_name, chat_context=chat_context)
 
     async def receive_message(self, content:str, user_id:int, user_name: str, chat_context:ChatContext):
-        await self.message_service(content=content, user_id=user_id, user_name=user_name, chat_context=chat_context)
+        await self.message_service.receive_message(content=content, user_id=user_id, user_name=user_name, chat_context=chat_context)
 
     async def receive_command(self, command: Command, chat_context: ChatContext):
         await self.command_service.handle_command(command=command, chat_context=chat_context)
