@@ -12,11 +12,11 @@ class MessageRequest(BaseModel):
     chat_id: int
 
 class WebServer:
-    app = FastAPI()
     def __init__(self, mobile_inbound_adapter: InputMessagePort):
         self.mobile_inbound_adapter = mobile_inbound_adapter
+        self.app = FastAPI()
+        self.app.post("/message")(self.receive_message)
 
-    @app.post("/message")
     async def receive_message(self, request: MessageRequest):
         await self.mobile_inbound_adapter.receive_message(request.content, request.user_id, request.user_name, ChatContext(request.chat_id))
         return {"status": "success", "message": "Message received"}
