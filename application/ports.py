@@ -11,15 +11,15 @@ from domain.command import Command
 #Driven Ports
 class InputMessagePort(ABC):
     @abstractmethod
-    def receive_message(self, content:str, user_id: int, user_name: str, chat_context:ChatContext):
+    async def receive_message(self, content:str, user_id: int, user_name: str, chat_context:ChatContext):
         pass
 
     @abstractmethod
-    def receive_photo(self, photo_data: bytearray, user_id: int, user_name: str, chat_context: ChatContext):
+    async def receive_photo(self, photo_data: bytearray, user_id: int, user_name: str, chat_context: ChatContext):
         pass
 
     @abstractmethod
-    def receive_command(self, command: Command, chat_context: ChatContext):
+    async def receive_command(self, command: Command, chat_context: ChatContext):
         pass
 
 class CommandServicePort(ABC):
