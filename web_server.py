@@ -16,7 +16,12 @@ class WebServer:
         self.mobile_inbound_adapter = mobile_inbound_adapter
         self.app = FastAPI()
         self.app.post("/message")(self.receive_message)
+        self.app.post("/command")(self.receive_command)
 
     async def receive_message(self, request: MessageRequest):
         await self.mobile_inbound_adapter.receive_message(request.content, request.user_id, request.user_name, ChatContext(request.chat_id))
         return {"status": "success", "message": "Message received"}
+
+    async def receive_command(self, request: MessageRequest):
+        await  self.mobile_inbound_adapter.receive_command(request.content, request.user_id, request.user_name, ChatContext(request.chat_id))
+        return {"status": "success", "message": "Command received"}

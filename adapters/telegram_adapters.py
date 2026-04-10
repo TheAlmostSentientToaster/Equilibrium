@@ -33,12 +33,8 @@ class TelegramInboundAdapter(InputMessagePort):
             elif update.message.text and update.message.text.startswith('/'):
                 command_text = update.message.text
                 command_parts = [command_text[1:]]
-                command = Command(
-                    content=command_parts[0],
-                    user_id=user_id,
-                    user_name=user_name
-                )
-                await self.receive_command(command, chat_context)
+
+                await self.receive_command(command_parts[0], user_id, user_name, chat_context)
             else:
                 content = update.message.text
                 await self.receive_message(content, user_id, user_name, chat_context)
@@ -47,10 +43,10 @@ class TelegramInboundAdapter(InputMessagePort):
         await self.photo_service.receive_photo(photo=photo_data, user_id=user_id, user_name=user_name, chat_context=chat_context)
 
     async def receive_message(self, content:str, user_id:int, user_name: str, chat_context:ChatContext):
-        await self.message_service.receive_message(content=content, user_id=user_id, user_name=user_name, chat_context=chat_context)
+        await self.message_service.receive_message(Message(message_id=None, content=content, user_id=user_id, user_name=user_name), chat_context=chat_context)
 
-    async def receive_command(self, command: Command, chat_context: ChatContext):
-        await self.command_service.handle_command(command=command, chat_context=chat_context)
+    async def receive_command(self, content:str, user_id: int, user_name: str, chat_context: ChatContext):
+        await self.command_service.handle_command(command=Command(content, user_id, user_name), chat_context=chat_context)
 
 
 class TelegramOutboundAdapter(OutputMessagePort):

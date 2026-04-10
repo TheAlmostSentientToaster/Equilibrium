@@ -20,8 +20,8 @@ class MobileAppInboundAdapter(InputMessagePort):
     async def receive_message(self, content: str, user_id: int, user_name: str, chat_context: ChatContext):
         await self.message_service(content=content, user_id=user_id, user_name=user_name, chat_context=chat_context)
 
-    def receive_command(self, command: Command, chat_context: ChatContext):
-        pass
+    async def receive_command(self, content:str, user_id: int, user_name: str, chat_context: ChatContext):
+        await self.command_service(self, Command(content, user_id, user_name))
 
 class MobileAppOutboundAdapter(OutputMessagePort):
     def __init__(self):

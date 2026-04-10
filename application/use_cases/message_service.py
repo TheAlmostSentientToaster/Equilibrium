@@ -7,8 +7,7 @@ class MessageService(MessageServicePort):
         self.repository_port = repository_port
         self.output_message_port = output_message_port
 
-    async def receive_message(self, content: str, user_id: int, user_name: str, chat_context: ChatContext):
-        message = Message(message_id=None, content=content, user_id=user_id, user_name=user_name)
+    async def receive_message(self, message: Message, chat_context: ChatContext):
         self.repository_port.save_message(message)
         await self.send_all_messages(chat_context)
 
