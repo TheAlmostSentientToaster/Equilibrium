@@ -5,6 +5,7 @@ from telegram.ext import ApplicationBuilder, MessageHandler, filters
 from telegram.request import HTTPXRequest
 
 from adapters.http_adapters import HttpOutboundAdapter
+from adapters.mobile_app_adapters import MobileAppInboundAdapter
 from application.use_cases.command_service import CommandService
 from application.use_cases.message_service import MessageService
 from adapters.telegram_adapters import TelegramOutboundAdapter, TelegramInboundAdapter
@@ -19,6 +20,7 @@ from domain.domain_services.image_processing_service import ImageProcessingServi
 from domain.domain_services.ocr_reading_service import OcrReadingService
 from domain.domain_services.price_extraction_service import PriceExtractionService
 from domain.domain_services.text_analyzing_service import TextAnalyzingService
+from web_server import WebServer
 
 config = Config()
 config.validate()
@@ -42,6 +44,9 @@ user_verification_service = UserVerificationService(output_message_port=telegram
 price_extraction_service = PriceExtractionService(ocr_reading_service, image_processing_service, text_analyzing_service, config=config)
 photo_service = PhotoService(repository_port=db_adapter, output_message_port=telegram_outbound_adapter, price_extraction_service=price_extraction_service)
 telegram_inbound_adapter = TelegramInboundAdapter(message_service, photo_service, application= app, command_service=command_service, user_verification_service=user_verification_service)
+mobile_inbound_adapter = MobileAppInboundAdapter(message_service, photo_service, command_service, user_verification_service)
+
+web_server = WebServer(mobile_inbound_adapter)
 
 command_service.post_command_hints(token=TOKEN)
 app.add_handler(MessageHandler(
