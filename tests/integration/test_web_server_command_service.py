@@ -1,6 +1,7 @@
 from unittest.mock import AsyncMock, MagicMock
 from fastapi.testclient import TestClient
 
+from domain.chat_context import ChatContext
 from domain.command import Command
 from web_server import WebServer
 from adapters.mobile_app_adapters import MobileAppInboundAdapter
@@ -40,9 +41,9 @@ class TestWebServerCommandService:
         assert response.status_code == 200
         assert response.json() == {"status": "success", "message": "Command received"}
 
-        self.mock_command_service.assert_called_once_with(
-            self.mobile_inbound_adapter,
-            Command(content="Hello, world!", user_id=12345, user_name="test_user")
+        self.mock_command_service.handle_command.assert_called_once_with(
+            Command(content="Hello, world!", user_id=12345, user_name="test_user"),
+            ChatContext(chat_id=67890)
         )
 
     def test_receive_message_invalid_request(self):

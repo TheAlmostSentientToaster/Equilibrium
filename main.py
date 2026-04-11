@@ -1,4 +1,7 @@
+import threading
+
 import easyocr
+import uvicorn
 
 from telegram import Bot
 from telegram.ext import ApplicationBuilder, MessageHandler, filters
@@ -52,4 +55,19 @@ command_service.post_command_hints(token=TOKEN)
 app.add_handler(MessageHandler(
     filters.TEXT | filters.PHOTO,
     telegram_inbound_adapter.on_update))
-app.run_polling()
+
+def run_telegram_bot():
+    app.run_polling()
+
+def run_web_server():
+    uvicorn.run(web_server.app, host="0.0.0.0", port=8000)
+
+if __name__ == "__main__":
+    telegram_thread = threading.Thread(target=run_telegram_bot)
+    fastapi_thread = threading.Thread(target=run_web_server)
+
+    telegram_thread.start()
+    fastapi_thread.start()
+
+    telegram_thread.join()
+    fastapi_thread.join()
