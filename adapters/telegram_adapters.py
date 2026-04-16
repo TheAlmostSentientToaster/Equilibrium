@@ -46,6 +46,9 @@ class TelegramInboundAdapter(InputMessagePort):
         await self.message_service.receive_message(Message(message_id=None, content=content, user_id=user_id, user_name=user_name), chat_context=chat_context)
 
     async def receive_command(self, content:str, user_id: int, user_name: str, chat_context: ChatContext):
+        content_split = content.split()
+        content_split[1] = content_split[1].replace(',', '.')
+        content = " ".join(content_split)
         await self.command_service.handle_command(command=Command(content, user_id, user_name), chat_context=chat_context)
 
 
