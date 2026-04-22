@@ -63,9 +63,7 @@ def run_web_server():
     uvicorn.run(web_server.app, host="0.0.0.0", port=8000)
 
 if __name__ == "__main__":
-    run_telegram_bot()
-    fastapi_thread = threading.Thread(target=run_web_server)
-
+    fastapi_thread = threading.Thread(target=run_web_server, daemon=True)
     fastapi_thread.start()
 
-    fastapi_thread.join()
+    run_telegram_bot()
