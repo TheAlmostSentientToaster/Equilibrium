@@ -44,11 +44,11 @@ class TestWebServerPhotoService:
         assert response.status_code == 200
         assert response.json() == {"status": "success", "message": "Photo received"}
 
-        self.mock_photo_service.assert_called_once_with(
-            photo_data=bytearray(test_image_bytes),
+        self.mock_photo_service.receive_photo.assert_called_once_with(
+            photo=bytearray(test_image_bytes),
             user_id=12345,
             user_name="test_user",
-            chat_context=ChatContext(67890)
+            chat_context=ChatContext(chat_id=67890)
         )
 
     def test_receive_photo_invalid_request(self):
@@ -84,11 +84,11 @@ class TestWebServerPhotoService:
         assert response.status_code == 200
         assert response.json() == {"status": "success", "message": "Photo received"}
 
-        self.mock_photo_service.assert_called_once_with(
-            photo_data=bytearray(b""),
+        self.mock_photo_service.receive_photo.assert_called_once_with(
+            photo=bytearray(b""),
             user_id=12345,
             user_name="test_user",
-            chat_context=ChatContext(67890)
+            chat_context=ChatContext(chat_id=67890)
         )
 
     def test_receive_photo_with_invalid_base64(self):
