@@ -15,7 +15,7 @@ class MobileAppInboundAdapter(InputMessagePort):
         self.user_verification_service = user_verification_service
 
     async def receive_photo(self, photo_data: bytearray, user_id: int, user_name: str, chat_context: ChatContext):
-        await self.photo_service(photo_data=photo_data, user_id=user_id, user_name=user_name, chat_context=chat_context)
+        await self.photo_service.receive_photo(photo=photo_data, user_id=user_id, user_name=user_name, chat_context=chat_context)
 
     async def receive_message(self, content: str, user_id: int, user_name: str, chat_context: ChatContext):
         await self.message_service(content=content, user_id=user_id, user_name=user_name, chat_context=chat_context)
