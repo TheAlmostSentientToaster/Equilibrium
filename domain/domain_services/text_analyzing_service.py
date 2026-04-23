@@ -18,6 +18,9 @@ class TextAnalyzingService(TextAnalyzingInterface):
             return False
 
     def get_all_lines(self, text_matrix) -> list[str]:
+        if len(text_matrix) == 0:
+            return []
+
         lines = []
         current_line = "" + text_matrix[0][1]
 
